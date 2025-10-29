@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: delivery
+  config:
+    import: optional:file:.env.dev[.properties]
+
+server:
+  port: 8080
