@@ -11,6 +11,7 @@ import lombok.ToString;
 
 @ToString
 @Getter
+@EqualsAndHashCode
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserId {
