@@ -1,7 +1,8 @@
-package com.zts.delivery.user;
+package com.zts.delivery.infrastructure.keycloak;
 
 
-import com.zts.delivery.infrastructure.keycloak.KeycloakProperties;
+import com.zts.delivery.infrastructure.execption.ApplicationException;
+import com.zts.delivery.infrastructure.execption.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
@@ -19,12 +20,12 @@ public class KeycloakTokenGenerateService implements TokenGenerateService {
     private final KeycloakProperties properties;
 
     @Override
-    public TokenInfo generate(String username, String password) {
+    public TokenInfo generate(String userId, String password) {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("grant_type", "password");
         form.add("client_id", properties.getClientId());
         form.add("client_secret", properties.getClientSecret());
-        form.add("username", username);
+        form.add("username", userId);
         form.add("password", password);
         form.add("scope", "openid profile email");
         RestClient client = RestClient.create();
@@ -38,7 +39,6 @@ public class KeycloakTokenGenerateService implements TokenGenerateService {
         if (res.getStatusCode().is2xxSuccessful()) {
             return res.getBody();
         }
-
-        return null;
+        throw new ApplicationException(ErrorCode.UNAUTHORIZED);
     }
 }
