@@ -1,4 +1,4 @@
-package com.zts.delivery.config;
+package com.zts.delivery.global.persistence.config;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
@@ -17,7 +17,6 @@ public class AuditorAwareImpl implements AuditorAware<String> {
             return Optional.of("SYSTEM");
         }
 
-        // 인증된 사용자의 이름(Username, 즉 ID)을 반환합니다.
         return Optional.of(authentication.getName());
     }
 }
