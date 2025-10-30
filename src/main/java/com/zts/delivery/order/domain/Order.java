@@ -21,6 +21,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -36,7 +37,6 @@ import lombok.NoArgsConstructor;
 public class Order extends BaseEntity {
 
     @EmbeddedId
-    @GeneratedValue(strategy = GenerationType.UUID)
     private OrderId id;
 
     @Version
@@ -69,6 +69,20 @@ public class Order extends BaseEntity {
         calculateTotalOrderPrice();
     }
 
+    public static Order create(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo) {
+
+        Order order = Order.builder()
+            .orderer(orderer)
+            .orderItems(orderItems)
+            .deliveryInfo(deliveryInfo)
+            .status(OrderStatus.ORDER_ACCEPT)
+            .build();
+
+        order.id = OrderId.of(UUID.randomUUID());
+
+        return order;
+    }
+
     private void setOrderItems(List<OrderItem> orderItems) {
         // if (orderItems == null || orderItems.isEmpty()) {
         //     throw new Exception("Order must have at least one order item.");
@@ -95,7 +109,7 @@ public class Order extends BaseEntity {
         // 입금 확인 전이면 주문 취소, 입금 후 주문 접수 후 5분 이내라면 상태라면 환불
         if (this.status == OrderStatus.ORDER_ACCEPT) {
             this.status = OrderStatus.ORDER_CANCEL;
-        } else if (getCreatedAt() != null && getCreatedAt().isBefore(getCreatedAt().plusMinutes(5L))) {
+        } else if (getCreatedAt() != null && LocalDateTime.now().isBefore(getCreatedAt().plusMinutes(5L))) {
             this.status = OrderStatus.ORDER_REFUND;
         }
     }
