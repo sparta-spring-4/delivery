@@ -26,7 +26,6 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Item extends BaseEntity {
     @EmbeddedId
-    @GeneratedValue(strategy = GenerationType.UUID)
     private ItemId id;
 
     @ElementCollection(fetch = FetchType.LAZY)

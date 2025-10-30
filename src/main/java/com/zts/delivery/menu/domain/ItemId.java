@@ -2,6 +2,7 @@ package com.zts.delivery.menu.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import lombok.ToString;
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ItemId {
+public class ItemId implements Serializable {
     @Column(name="item_id")
     private UUID id;
 
