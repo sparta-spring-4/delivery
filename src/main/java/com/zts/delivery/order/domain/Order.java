@@ -36,7 +36,6 @@ import lombok.NoArgsConstructor;
 public class Order extends BaseEntity {
 
     @EmbeddedId
-    @GeneratedValue(strategy = GenerationType.UUID)
     private OrderId id;
 
     @Version
@@ -87,7 +86,6 @@ public class Order extends BaseEntity {
 
         // 결제 요청 이벤트 발생 시키기
         // Events.trigger(new OrderAcceptEvent(id));
-        return;
     }
 
     // 주문 취소
@@ -95,7 +93,7 @@ public class Order extends BaseEntity {
         // 입금 확인 전이면 주문 취소, 입금 후 주문 접수 후 5분 이내라면 상태라면 환불
         if (this.status == OrderStatus.ORDER_ACCEPT) {
             this.status = OrderStatus.ORDER_CANCEL;
-        } else if (getCreatedAt() != null && getCreatedAt().isBefore(getCreatedAt().plusMinutes(5L))) {
+        } else if (getCreatedAt() != null && java.time.LocalDateTime.now().isBefore(getCreatedAt().plusMinutes(5L))) {
             this.status = OrderStatus.ORDER_REFUND;
         }
     }
