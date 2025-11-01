@@ -1,0 +1,76 @@
+services:
+  delivery:
+    container_name: delivery-service
+    restart: always
+    image: ${IMAGE_URI}
+    environment:
+      JWT_ISSUER_URI: ${JWT_ISSUER_URI}
+      DB_HOST: postgres
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DDL_AUTO: update
+      KEYCLOAK_SERVER_URL: ${KEYCLOAK_SERVER_URL}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      KEYCLOAK_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "3000:8080"
+    depends_on:
+      - postgres
+    networks:
+      - delivery-net
+  postgres:
+    image: postgres
+    container_name: postgres-delivery
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: delivery
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres-delivery-data:/var/lib/postgresql
+      - ./init-db/create_schemas.sql:/docker-entrypoint-initdb.d/create_schemas.sql:ro
+    ports:
+      - '5432:5432'
+    networks:
+      - delivery-net
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    container_name: keycloak
+    restart: unless-stopped
+    environment:
+      # 개발용 관리자 계정 (dev 모드에서 편리)
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      # DB 설정
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-delivery:5432/delivery?currentSchema=keycloak
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      # Optional: 호스트명/포워딩 설정 (리버스 프록시 뒤에 둘 경우)
+      KC_HOSTNAME_STRICT: "false"
+      KC_PROXY_HEADERS: xforwarded
+      PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_FRONTEND_URL: ${KEYCLOAK_SERVER_URL}
+    command:
+      - start-dev
+    ports:
+      - '3300:8080'
+    depends_on:
+      - postgres
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+      # realm 자동 임포트용 (선택)
+      # - ./import/realms:/opt/keycloak/data/import
+    networks:
+      - delivery-net
+
+volumes:
+  postgres-delivery-data:
+  keycloak-data:
+
+networks:
+  delivery-net:
