@@ -57,7 +57,7 @@ jobs:
 
           # 📂 파일 전송 정보
           source: "docker-compose.yml,init-db"
-          target: "/home/{{secrets.REMOTE_USER}}/delivery"
+          target: "/home/${{ secrets.REMOTE_USER }}/delivery"
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v0.1.6
@@ -70,34 +70,38 @@ jobs:
             echo "--- 배포 시작 ---"
             
             # 1. docker-compose.yml 파일이 있는 dir로 이동
-            cd /home/{{secrets.REMOTE_USER}}/delivery
+            cd /home/${{ secrets.REMOTE_USER }}/delivery
             
             # 2. 민감한 환경 변수들로 임시 .env 파일을 동적으로 생성 (보안 강화)
             echo "IMAGE_URI=${{ env.IMAGE_URI }}" > .env.temp
-            echo "JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" > .env.temp
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" > .env.temp
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env.temp
-            echo "KEYCLOAK_SERVER_URL=${{ secrets.KEYCLOAK_SERVER_URL }}" > .env.temp
-            echo "KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }}" > .env.temp
-            echo "KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}" > .env.temp
-            echo "KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}" > .env.temp
-            echo "KEYCLOAK_ADMIN_USERNAME=${{ secrets.KEYCLOAK_ADMIN_USERNAME }}" > .env.temp
-            echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" > .env.temp
+            echo "JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" >> .env.temp
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.temp
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.temp
+            echo "KEYCLOAK_SERVER_URL=${{ secrets.KEYCLOAK_SERVER_URL }}" >> .env.temp
+            echo "KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }}" >> .env.temp
+            echo "KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}" >> .env.temp
+            echo "KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}" >> .env.temp
+            echo "KEYCLOAK_ADMIN_USERNAME=${{ secrets.KEYCLOAK_ADMIN_USERNAME }}" >> .env.temp
+            echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env.temp
             
-            # 3. 최신 Docker 이미지 풀 (Pull)
+            # 3. GHCR 로그인 (GITHUB_TOKEN 사용)
+            echo "--- GHCR 로그인 ---"
+            echo ${{ secrets.GITHUB_TOKEN }} | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # 4. 최신 Docker 이미지 풀 (Pull)
             echo "Pulling latest Docker images..."
-            docker-compose --env-file .env.temp pull delivery
+            sudo docker compose --env-file .env.temp pull delivery
             
             # 5. 서비스 재시작 (Up)
             #    -d: 백그라운드 실행, --remove-orphans: 더 이상 필요 없는 컨테이너 정리
             echo "Starting Docker Compose services..."
-            docker-compose --env-file .env.temp up -d --remove-orphans
+            sudo docker compose --env-file .env.temp up -d --remove-orphans
             
             # 6. 임시 .env 파일 즉시 삭제 (⭐️필수 권장 단계)
             echo "Removing temporary .env file..."
             sudo rm .env.temp
             
             # 7. (선택적) 컨테이너 상태 확인
-            docker-compose ps
+            docker compose ps
 
             echo "--- 배포 완료: http://[EC2 IP]:3000 ---"
