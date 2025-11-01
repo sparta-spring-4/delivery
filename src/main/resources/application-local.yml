@@ -1,4 +1,10 @@
 spring:
+  # 시큐리티 - oauth2설정
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:3300/realms/dev
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:delivery-db;MODE=PostgreSQL
@@ -14,6 +20,7 @@ spring:
       ddl-auto: create
     open-in-view: false
     generate-ddl: false
+
     # OPEN DOC API 설정
     springdoc:
       version: '1.0.0'
@@ -29,3 +36,10 @@ spring:
         doc-expansion: full
       paths-to-match:
         - /v1/**
+keycloak:
+  server-url: http://localhost:3300
+  realm: dev
+  client-id: delivery-app
+  client-secret: CewnKfmXekjtygQ0TpHEh8VQzubBOLIW
+  admin-username: admin
+  admin-password: admin
