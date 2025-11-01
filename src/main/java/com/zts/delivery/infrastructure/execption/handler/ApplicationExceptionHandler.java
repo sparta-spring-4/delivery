@@ -17,7 +17,7 @@ import java.util.List;
 public class ApplicationExceptionHandler {
 
     @ExceptionHandler(value = ApplicationException.class)
-    public ResponseEntity<ErrorResponse<Void>> applicationException(ApplicationException e) {
+    public ResponseEntity<ErrorResponse<Void>> handleApplicationException(ApplicationException e) {
         log.error("ApplicationException", e);
 
         return ResponseEntity
@@ -28,7 +28,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse<List<FieldError>>> methodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse<List<FieldError>>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors()
                 .stream().map(
                         it -> new FieldError(it.getField(), it.getRejectedValue(), it.getDefaultMessage())
@@ -40,7 +40,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ErrorResponse<Void>> exception(Exception e) {
+    public ResponseEntity<ErrorResponse<Void>> handleAllUncaughtException(Exception e) {
         log.error("Exception", e);
 
         ErrorCode internalServerError = ErrorCode.INTERNAL_SERVER_ERROR;
