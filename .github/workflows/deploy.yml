@@ -57,7 +57,7 @@ jobs:
 
           # 📂 파일 전송 정보
           source: "docker-compose.yml,init-db"
-          target: "/home/{{secrets.REMOTE_USER}}/delivery"
+          target: "/home/${{ secrets.REMOTE_USER }}/delivery"
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v0.1.6
