@@ -20,7 +20,6 @@ spring:
       ddl-auto: create
     open-in-view: false
     generate-ddl: false
-
     # OPEN DOC API 설정
     springdoc:
       version: '1.0.0'
