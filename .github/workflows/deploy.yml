@@ -73,16 +73,16 @@ jobs:
             cd /home/${{ secrets.REMOTE_USER }}/delivery
             
             # 2. 민감한 환경 변수들로 임시 .env 파일을 동적으로 생성 (보안 강화)
-            echo "IMAGE_URI=${{ env.IMAGE_URI }}" > .env.temp
-            echo "JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" > .env.temp
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" > .env.temp
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env.temp
-            echo "KEYCLOAK_SERVER_URL=${{ secrets.KEYCLOAK_SERVER_URL }}" > .env.temp
-            echo "KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }}" > .env.temp
-            echo "KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}" > .env.temp
-            echo "KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}" > .env.temp
-            echo "KEYCLOAK_ADMIN_USERNAME=${{ secrets.KEYCLOAK_ADMIN_USERNAME }}" > .env.temp
-            echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" > .env.temp
+            echo "IMAGE_URI=${{ env.IMAGE_URI }}" >> .env.temp
+            echo "JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" >> .env.temp
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.temp
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.temp
+            echo "KEYCLOAK_SERVER_URL=${{ secrets.KEYCLOAK_SERVER_URL }}" >> .env.temp
+            echo "KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }}" >> .env.temp
+            echo "KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }}" >> .env.temp
+            echo "KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }}" >> .env.temp
+            echo "KEYCLOAK_ADMIN_USERNAME=${{ secrets.KEYCLOAK_ADMIN_USERNAME }}" >> .env.temp
+            echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env.temp
             
             # 3. 최신 Docker 이미지 풀 (Pull)
             echo "Pulling latest Docker images..."
