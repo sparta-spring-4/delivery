@@ -90,12 +90,12 @@ jobs:
             
             # 4. 최신 Docker 이미지 풀 (Pull)
             echo "Pulling latest Docker images..."
-            docker compose --env-file .env.temp pull delivery
+            sudo docker compose --env-file .env.temp pull delivery
             
             # 5. 서비스 재시작 (Up)
             #    -d: 백그라운드 실행, --remove-orphans: 더 이상 필요 없는 컨테이너 정리
             echo "Starting Docker Compose services..."
-            docker compose --env-file .env.temp up -d --remove-orphans
+            sudo docker compose --env-file .env.temp up -d --remove-orphans
             
             # 6. 임시 .env 파일 즉시 삭제 (⭐️필수 권장 단계)
             echo "Removing temporary .env file..."
