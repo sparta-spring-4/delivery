@@ -73,7 +73,7 @@ jobs:
             cd /home/${{ secrets.REMOTE_USER }}/delivery
             
             # 2. 민감한 환경 변수들로 임시 .env 파일을 동적으로 생성 (보안 강화)
-            echo "IMAGE_URI=${{ env.IMAGE_URI }}" >> .env.temp
+            echo "IMAGE_URI=${{ env.IMAGE_URI }}" > .env.temp
             echo "JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" >> .env.temp
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.temp
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.temp
@@ -84,7 +84,11 @@ jobs:
             echo "KEYCLOAK_ADMIN_USERNAME=${{ secrets.KEYCLOAK_ADMIN_USERNAME }}" >> .env.temp
             echo "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" >> .env.temp
             
-            # 3. 최신 Docker 이미지 풀 (Pull)
+            # 3. GHCR 로그인 (GITHUB_TOKEN 사용)
+            echo "--- GHCR 로그인 ---"
+            echo ${{ secrets.GITHUB_TOKEN }} | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # 4. 최신 Docker 이미지 풀 (Pull)
             echo "Pulling latest Docker images..."
             docker compose --env-file .env.temp pull delivery
             
