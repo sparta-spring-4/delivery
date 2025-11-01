@@ -10,7 +10,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_SERVER_URL}/realms/${KEYCLOAK_REALM}
+          issuer-uri: ${JWT_ISSUER_URI}
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DB_URL}

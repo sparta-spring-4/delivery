@@ -78,6 +78,7 @@ jobs:
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
             -e DB_DDL_AUTO=update \
+            -e JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }} \
             -e KEYCLOAK_SERVER_URL=${{ secrets.KEYCLOAK_SERVER_URL }} \
             -e KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }} \
             -e KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }} \
