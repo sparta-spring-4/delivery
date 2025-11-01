@@ -70,7 +70,7 @@ jobs:
             echo "--- 배포 시작 ---"
             
             # 1. docker-compose.yml 파일이 있는 dir로 이동
-            cd /home/${{secrets.REMOTE_USER}}/delivery
+            cd /home/${{ secrets.REMOTE_USER }}/delivery
             
             # 2. 민감한 환경 변수들로 임시 .env 파일을 동적으로 생성 (보안 강화)
             echo "IMAGE_URI=${{ env.IMAGE_URI }}" > .env.temp
