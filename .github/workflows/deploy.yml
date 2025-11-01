@@ -50,10 +50,10 @@ jobs:
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.REMOTE_IP }} 
-          username: ${{ secrets.REMOTE_USER }} 
-          key: ${{ secrets.REMOTE_PRIVATE_KEY }} 
-          port: ${{ secrets.REMOTE_SSH_PORT }} 
+          host: ${{ secrets.REMOTE_IP }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
             echo "--- 배포 시작 ---"
             # 1. 기존 컨테이너 중지/삭제
@@ -78,6 +78,12 @@ jobs:
             -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
             -e DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
             -e DB_DDL_AUTO=update \
+            -e KEYCLOAK_SERVER_URL=${{ secrets.KEYCLOAK_SERVER_URL }} \
+            -e KEYCLOAK_REALM=${{ secrets.KEYCLOAK_REALM }} \
+            -e KEYCLOAK_CLIENT_ID=${{ secrets.KEYCLOAK_CLIENT_ID }} \
+            -e KEYCLOAK_CLIENT_SECRET=${{ secrets.KEYCLOAK_CLIENT_SECRET }} \
+            -e KEYCLOAK_ADMIN_USERNAME=${{ secrets.KEYCLOAK_ADMIN_USERNAME }} \
+            -e KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }} \
             ${{ env.IMAGE_URI }}
 
             echo "--- 배포 완료: http://[EC2 IP]:3000 ---"
