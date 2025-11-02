@@ -1,5 +1,6 @@
 package com.zts.delivery.order.domain;
 
+import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
