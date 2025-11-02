@@ -12,7 +12,7 @@ public class ApplicationException extends HttpStatusCodeException {
     public ApplicationException(ErrorCode errorCode) {
         super(errorCode.getHttpStatus());
         this.code = errorCode.getCode();
-        this.message = errorCode.getMessage();
+        this.message = errorCode.getDefaultMessage();
     }
 
     public ApplicationException(ErrorCode errorCode, String message) {
