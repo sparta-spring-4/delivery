@@ -5,9 +5,7 @@ import com.zts.delivery.user.application.dto.UserProfile;
 import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
 import com.zts.delivery.user.application.service.TokenGenerateService;
-import com.zts.delivery.user.application.service.UserProfileService;
-import com.zts.delivery.user.application.service.UserRegisterService;
-import com.zts.delivery.user.application.service.UserUpdateService;
+import com.zts.delivery.user.application.service.UserService;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import com.zts.delivery.user.presentation.dto.*;
 import jakarta.validation.Valid;
@@ -25,9 +23,7 @@ import java.util.UUID;
 public class UserController {
 
     private final TokenGenerateService tokenService;
-    private final UserRegisterService registerService;
-    private final UserUpdateService updateService;
-    private final UserProfileService profileService;
+    private final UserService userService;
 
     @PostMapping("signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -40,7 +36,7 @@ public class UserController {
                 .lastName(req.lastName())
                 .phone(req.phone())
                 .build();
-        registerService.register(dto);
+        userService.register(dto);
     }
 
     @PatchMapping("profile")
@@ -52,12 +48,12 @@ public class UserController {
                 .lastName(req.lastName())
                 .phone(req.phone())
                 .build();
-        updateService.update(user.userId(), dto);
+        userService.update(user.userId(), dto);
     }
 
     @PatchMapping("password")
     public void changePassword(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody PasswordChangeRequest req) {
-        updateService.updatePassword(user.userId(), req.password());
+        userService.updatePassword(user.userId(), req.password());
     }
 
     @PostMapping("token")
@@ -74,7 +70,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public UserResponse getProfile(@AuthenticationPrincipal UserPrincipal principal) {
-        UserProfile userProfile = profileService.getUserProfile(principal.userId());
+        UserProfile userProfile = userService.getUserProfile(principal.userId());
         return UserResponse.builder()
                 .userId(userProfile.userId())
                 .username(userProfile.username())
@@ -87,7 +83,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/profile/{userId}")
     public UserResponse userProfile(@PathVariable("userId") String userId) {
-        UserProfile userProfile = profileService.getUserProfile(UUID.fromString(userId));
+        UserProfile userProfile = userService.getUserProfile(UUID.fromString(userId));
         return UserResponse.builder()
                 .userId(userProfile.userId())
                 .username(userProfile.username())

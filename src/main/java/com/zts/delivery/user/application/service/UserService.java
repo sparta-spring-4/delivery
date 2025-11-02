@@ -1,0 +1,68 @@
+package com.zts.delivery.user.application.service;
+
+import com.zts.delivery.infrastructure.execption.ApplicationException;
+import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.user.application.dto.UserProfile;
+import com.zts.delivery.user.application.dto.UserRegister;
+import com.zts.delivery.user.application.dto.UserUpdate;
+import com.zts.delivery.user.domain.Role;
+import com.zts.delivery.user.domain.User;
+import com.zts.delivery.user.domain.UserId;
+import com.zts.delivery.user.domain.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    public void register(UserRegister dto) {
+        checkDuplicatedUsername(dto.username());
+        checkDuplicatedEmail(dto.email());
+        User user = dto.toUser(List.of(Role.USER));
+        userRepository.save(user);
+    }
+
+    public void update(UUID userId, UserUpdate dto) {
+        UserProfile foundUser = getUserProfile(userId);
+        if (dto.email() != null && !dto.email().equals(foundUser.email())) {
+            checkDuplicatedEmail(dto.email());
+        }
+
+        User user = User.builder()
+                .id(UserId.of(userId))
+                .firstName(dto.firstName())
+                .lastName(dto.lastName())
+                .email(dto.email())
+                .phone(dto.phone())
+                .build();
+        userRepository.save(user);
+    }
+
+    public void updatePassword(UUID userId, String password) {
+        userRepository.updatePassword(UserId.of(userId), password);
+    }
+
+    public UserProfile getUserProfile(UUID userId) {
+        return userRepository.findById(UserId.of(userId))
+                .map(UserProfile::of)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private void checkDuplicatedUsername(String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new ApplicationException(ErrorCode.DUPLICATED_USERNAME);
+        }
+    }
+
+    private void checkDuplicatedEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new ApplicationException(ErrorCode.DUPLICATED_EMAIL);
+        }
+    }
+}
