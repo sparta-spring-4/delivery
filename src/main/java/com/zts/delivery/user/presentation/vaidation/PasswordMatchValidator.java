@@ -1,18 +1,19 @@
 package com.zts.delivery.user.presentation.vaidation;
 
-import com.zts.delivery.user.presentation.dto.UserRegisterRequest;
+import com.zts.delivery.user.presentation.dto.PasswordContainer;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.springframework.util.StringUtils;
 
-public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, UserRegisterRequest> {
+public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, PasswordContainer> {
 
     @Override
-    public boolean isValid(UserRegisterRequest dto, ConstraintValidatorContext context) {
-        String password = dto.password();
-        String confirmedPassword = dto.confirmedPassword();
+    public boolean isValid(PasswordContainer pc, ConstraintValidatorContext context) {
+        String password = pc.password();
+        String confirmedPassword = pc.confirmedPassword();
 
-        if (password == null || confirmedPassword == null) {
-            return false;
+        if (!StringUtils.hasText(password) || !StringUtils.hasText(confirmedPassword)) {
+            return true;
         }
 
         return password.equals(confirmedPassword);

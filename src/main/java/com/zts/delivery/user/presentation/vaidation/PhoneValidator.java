@@ -2,6 +2,8 @@ package com.zts.delivery.user.presentation.vaidation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.springframework.util.StringUtils;
+
 import java.util.regex.Pattern;
 
 public class PhoneValidator implements ConstraintValidator<Phone, String> {
@@ -16,9 +18,10 @@ public class PhoneValidator implements ConstraintValidator<Phone, String> {
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null || value.trim().isEmpty()) {
+        if (!StringUtils.hasText(value)) {
             return true;
         }
+
         return pattern.matcher(value).matches();
     }
 }

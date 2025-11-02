@@ -32,5 +32,5 @@ public record UserRegisterRequest(
         @NotBlank
         @Phone
         String phone
-) {
+) implements PasswordContainer {
 }
