@@ -1,13 +1,13 @@
 package com.zts.delivery.user.presentation.dto;
 
+import com.zts.delivery.user.presentation.vaidation.Password;
 import com.zts.delivery.user.presentation.vaidation.PasswordMatch;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 @PasswordMatch
 public record PasswordChangeRequest(
         @NotBlank
-        @Size(min = 8)
+        @Password
         String password,
 
         @NotBlank

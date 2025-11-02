@@ -1,5 +1,6 @@
 package com.zts.delivery.user.presentation.dto;
 
+import com.zts.delivery.user.presentation.vaidation.Password;
 import com.zts.delivery.user.presentation.vaidation.PasswordMatch;
 import com.zts.delivery.user.presentation.vaidation.Phone;
 import jakarta.validation.constraints.Email;
@@ -13,7 +14,7 @@ public record UserRegisterRequest(
         String username,
 
         @NotBlank
-        @Size(min = 8)
+        @Password
         String password,
 
         @NotBlank
