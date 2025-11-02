@@ -1,4 +1,4 @@
-package com.zts.delivery.infrastructure.keycloak;
+package com.zts.delivery.user.infrastructure.keycloak;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

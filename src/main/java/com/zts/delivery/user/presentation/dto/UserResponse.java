@@ -1,4 +1,4 @@
-package com.zts.delivery.user;
+package com.zts.delivery.user.presentation.dto;
 
 import lombok.Builder;
 
@@ -10,4 +10,5 @@ public record UserResponse(
         String userId,
         String email,
         String name
-) {}
+) {
+}

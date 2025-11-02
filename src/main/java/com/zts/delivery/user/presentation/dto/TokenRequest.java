@@ -1,4 +1,4 @@
-package com.zts.delivery.user;
+package com.zts.delivery.user.presentation.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -7,4 +7,5 @@ public record TokenRequest(
         String userId,
         @NotBlank
         String password
-) {}
+) {
+}

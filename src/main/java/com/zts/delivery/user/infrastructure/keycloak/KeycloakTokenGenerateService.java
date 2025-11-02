@@ -1,4 +1,4 @@
-package com.zts.delivery.infrastructure.keycloak;
+package com.zts.delivery.user.infrastructure.keycloak;
 
 
 import com.zts.delivery.infrastructure.execption.ApplicationException;
