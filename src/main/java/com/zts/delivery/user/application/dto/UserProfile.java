@@ -1,11 +1,11 @@
-package com.zts.delivery.user.presentation.dto;
+package com.zts.delivery.user.application.dto;
 
 import lombok.Builder;
 
 import java.util.UUID;
 
 @Builder
-public record UserResponse(
+public record UserProfile(
         UUID userId,
         String username,
         String email,

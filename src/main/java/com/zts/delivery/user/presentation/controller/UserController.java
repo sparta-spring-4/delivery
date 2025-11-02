@@ -1,18 +1,20 @@
 package com.zts.delivery.user.presentation.controller;
 
+import com.zts.delivery.user.application.dto.TokenInfo;
+import com.zts.delivery.user.application.dto.UserProfile;
 import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
+import com.zts.delivery.user.application.service.TokenGenerateService;
+import com.zts.delivery.user.application.service.UserProfileService;
 import com.zts.delivery.user.application.service.UserRegisterService;
 import com.zts.delivery.user.application.service.UserUpdateService;
-import com.zts.delivery.user.presentation.dto.*;
-import com.zts.delivery.user.application.service.TokenGenerateService;
-import com.zts.delivery.user.application.dto.TokenInfo;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
+import com.zts.delivery.user.presentation.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -25,6 +27,7 @@ public class UserController {
     private final TokenGenerateService tokenService;
     private final UserRegisterService registerService;
     private final UserUpdateService updateService;
+    private final UserProfileService profileService;
 
     @PostMapping("signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -71,12 +74,26 @@ public class UserController {
 
     @GetMapping("/profile")
     public UserResponse getProfile(@AuthenticationPrincipal UserPrincipal principal) {
-        return UserResponse
-                .builder()
-                .userId(principal.userId())
-                .username(principal.username())
-                .name(principal.name())
-                .email(principal.email())
+        UserProfile userProfile = profileService.getUserProfile(principal.userId());
+        return UserResponse.builder()
+                .userId(userProfile.userId())
+                .username(userProfile.username())
+                .name(userProfile.username())
+                .email(userProfile.email())
+                .phone(userProfile.phone())
+                .build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/profile/{userId}")
+    public UserResponse userProfile(@PathVariable("userId") String userId) {
+        UserProfile userProfile = profileService.getUserProfile(UUID.fromString(userId));
+        return UserResponse.builder()
+                .userId(userProfile.userId())
+                .username(userProfile.username())
+                .name(userProfile.username())
+                .email(userProfile.email())
+                .phone(userProfile.phone())
                 .build();
     }
 }
