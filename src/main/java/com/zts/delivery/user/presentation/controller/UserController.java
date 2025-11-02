@@ -1,8 +1,11 @@
-package com.zts.delivery.user;
+package com.zts.delivery.user.presentation.controller;
 
-import com.zts.delivery.infrastructure.keycloak.TokenGenerateService;
-import com.zts.delivery.infrastructure.keycloak.TokenInfo;
-import com.zts.delivery.infrastructure.security.UserPrincipal;
+import com.zts.delivery.user.presentation.dto.UserResponse;
+import com.zts.delivery.user.infrastructure.keycloak.TokenGenerateService;
+import com.zts.delivery.user.infrastructure.keycloak.TokenInfo;
+import com.zts.delivery.user.infrastructure.security.UserPrincipal;
+import com.zts.delivery.user.presentation.dto.TokenRequest;
+import com.zts.delivery.user.presentation.dto.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

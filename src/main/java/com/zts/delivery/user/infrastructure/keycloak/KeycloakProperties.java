@@ -1,4 +1,4 @@
-package com.zts.delivery.infrastructure.keycloak;
+package com.zts.delivery.user.infrastructure.keycloak;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
