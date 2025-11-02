@@ -1,11 +1,11 @@
 package com.zts.delivery.user.presentation.controller;
 
-import com.zts.delivery.user.infrastructure.application.dto.UserRegister;
-import com.zts.delivery.user.infrastructure.application.service.UserRegisterService;
+import com.zts.delivery.user.application.dto.UserRegister;
+import com.zts.delivery.user.application.service.UserRegisterService;
 import com.zts.delivery.user.presentation.dto.UserRegisterRequest;
 import com.zts.delivery.user.presentation.dto.UserResponse;
-import com.zts.delivery.user.infrastructure.application.service.TokenGenerateService;
-import com.zts.delivery.user.infrastructure.application.dto.TokenInfo;
+import com.zts.delivery.user.application.service.TokenGenerateService;
+import com.zts.delivery.user.application.dto.TokenInfo;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import com.zts.delivery.user.presentation.dto.TokenRequest;
 import com.zts.delivery.user.presentation.dto.TokenResponse;
