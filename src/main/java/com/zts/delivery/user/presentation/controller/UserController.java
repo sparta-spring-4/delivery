@@ -1,5 +1,8 @@
 package com.zts.delivery.user.presentation.controller;
 
+import com.zts.delivery.user.infrastructure.application.dto.UserRegister;
+import com.zts.delivery.user.infrastructure.application.service.UserRegisterService;
+import com.zts.delivery.user.presentation.dto.UserRegisterRequest;
 import com.zts.delivery.user.presentation.dto.UserResponse;
 import com.zts.delivery.user.infrastructure.application.service.TokenGenerateService;
 import com.zts.delivery.user.infrastructure.application.dto.TokenInfo;
@@ -8,6 +11,7 @@ import com.zts.delivery.user.presentation.dto.TokenRequest;
 import com.zts.delivery.user.presentation.dto.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +21,21 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final TokenGenerateService tokenService;
+    private final UserRegisterService registerService;
+
+    @PostMapping("signup")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void signUp(@Valid @RequestBody UserRegisterRequest req) {
+        UserRegister dto = UserRegister.builder()
+                .username(req.username())
+                .password(req.password())
+                .email(req.email())
+                .firstName(req.firstName())
+                .lastName(req.lastName())
+                .phone(req.phone())
+                .build();
+        registerService.register(dto);
+    }
 
     @PostMapping("token")
     public TokenResponse generateToken(@Valid @RequestBody TokenRequest req) {

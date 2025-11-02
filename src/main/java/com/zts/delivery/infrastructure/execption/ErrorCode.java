@@ -16,9 +16,13 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Internal Server Error"),
 
     // validation
-    REQUEST_VALIDATION_ERROR(HttpStatus.PRECONDITION_FAILED, 1000, "Request value is not valid");
+    REQUEST_VALIDATION_ERROR(HttpStatus.PRECONDITION_FAILED, 1000, "Request value is not valid"),
+
+    // user
+    DUPLICATED_USERNAME(HttpStatus.CONFLICT, 2000, "Username is already taken."),
+    DUPLICATED_EMAIL(HttpStatus.CONFLICT, 2001, "Email is already in use.");
 
     private final HttpStatus httpStatus;
     private final int code;
-    private final String message;
+    private final String defaultMessage;
 }
