@@ -4,9 +4,12 @@ import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.infrastructure.execption.ErrorCode;
 import com.zts.delivery.user.application.dto.UserUpdate;
 import com.zts.delivery.user.infrastructure.keycloak.KeycloakProperties;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,14 @@ public class UserUpdateService {
         updateEmail(user, dto.email());
         updateAttributes(user, dto);
         keycloak.realm(properties.getRealm()).users().get(userId.toString()).update(user);
+    }
+
+    public void updatePassword(UUID userId, String newPassword) {
+        CredentialRepresentation passwordCred = new CredentialRepresentation();
+        passwordCred.setTemporary(false);
+        passwordCred.setType(CredentialRepresentation.PASSWORD);
+        passwordCred.setValue(newPassword);
+        keycloak.realm(properties.getRealm()).users().get(userId.toString()).resetPassword(passwordCred);
     }
 
     private void updateFirstName(UserRepresentation user, String firstName) {
@@ -73,5 +84,4 @@ public class UserUpdateService {
     private UserRepresentation getUserProfile(UUID userId) {
         return keycloak.realm(properties.getRealm()).users().get(userId.toString()).toRepresentation();
     }
-
 }

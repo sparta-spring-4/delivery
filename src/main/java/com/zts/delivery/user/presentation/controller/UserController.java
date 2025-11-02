@@ -52,6 +52,10 @@ public class UserController {
         updateService.update(user.userId(), dto);
     }
 
+    @PatchMapping("password")
+    public void changePassword(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody PasswordChangeRequest req) {
+        updateService.updatePassword(user.userId(), req.password());
+    }
 
     @PostMapping("token")
     public TokenResponse generateToken(@Valid @RequestBody TokenRequest req) {
