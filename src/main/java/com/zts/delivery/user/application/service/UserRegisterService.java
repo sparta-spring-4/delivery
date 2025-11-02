@@ -1,9 +1,9 @@
-package com.zts.delivery.user.infrastructure.application.service;
+package com.zts.delivery.user.application.service;
 
 import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.infrastructure.execption.ErrorCode;
 import com.zts.delivery.user.domain.Role;
-import com.zts.delivery.user.infrastructure.application.dto.UserRegister;
+import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.infrastructure.keycloak.KeycloakProperties;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;

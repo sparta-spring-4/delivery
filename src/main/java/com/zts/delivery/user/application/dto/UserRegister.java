@@ -1,4 +1,4 @@
-package com.zts.delivery.user.infrastructure.application.dto;
+package com.zts.delivery.user.application.dto;
 
 import lombok.Builder;
 

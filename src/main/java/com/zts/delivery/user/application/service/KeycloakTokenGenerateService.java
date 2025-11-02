@@ -1,10 +1,10 @@
-package com.zts.delivery.user.infrastructure.application.service;
+package com.zts.delivery.user.application.service;
 
 
 import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.infrastructure.execption.ErrorCode;
 import com.zts.delivery.user.infrastructure.keycloak.KeycloakProperties;
-import com.zts.delivery.user.infrastructure.application.dto.TokenInfo;
+import com.zts.delivery.user.application.dto.TokenInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
