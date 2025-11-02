@@ -6,8 +6,8 @@ import java.util.UUID;
 
 @Builder
 public record UserResponse(
-        UUID id,
-        String userId,
+        UUID userId,
+        String username,
         String email,
         String name
 ) {

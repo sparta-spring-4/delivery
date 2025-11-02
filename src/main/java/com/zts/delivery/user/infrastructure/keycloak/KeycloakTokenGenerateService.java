@@ -20,12 +20,12 @@ public class KeycloakTokenGenerateService implements TokenGenerateService {
     private final KeycloakProperties properties;
 
     @Override
-    public TokenInfo generate(String userId, String password) {
+    public TokenInfo generate(String username, String password) {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("grant_type", "password");
         form.add("client_id", properties.getClientId());
         form.add("client_secret", properties.getClientSecret());
-        form.add("username", userId);
+        form.add("username", username);
         form.add("password", password);
         form.add("scope", "openid profile email");
         RestClient client = RestClient.create();
