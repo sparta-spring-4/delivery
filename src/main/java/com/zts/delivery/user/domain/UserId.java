@@ -1,4 +1,4 @@
-package com.zts.delivery.order.domain;
+package com.zts.delivery.user.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
