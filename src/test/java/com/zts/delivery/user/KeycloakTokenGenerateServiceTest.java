@@ -1,7 +1,7 @@
 package com.zts.delivery.user;
 
-import com.zts.delivery.user.infrastructure.keycloak.TokenGenerateService;
-import com.zts.delivery.user.infrastructure.keycloak.TokenInfo;
+import com.zts.delivery.user.infrastructure.application.service.TokenGenerateService;
+import com.zts.delivery.user.infrastructure.application.dto.TokenInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
