@@ -1,19 +1,21 @@
 package com.zts.delivery.user.presentation.controller;
 
 import com.zts.delivery.user.application.dto.UserRegister;
+import com.zts.delivery.user.application.dto.UserUpdate;
 import com.zts.delivery.user.application.service.UserRegisterService;
-import com.zts.delivery.user.presentation.dto.UserRegisterRequest;
-import com.zts.delivery.user.presentation.dto.UserResponse;
+import com.zts.delivery.user.application.service.UserUpdateService;
+import com.zts.delivery.user.presentation.dto.*;
 import com.zts.delivery.user.application.service.TokenGenerateService;
 import com.zts.delivery.user.application.dto.TokenInfo;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
-import com.zts.delivery.user.presentation.dto.TokenRequest;
-import com.zts.delivery.user.presentation.dto.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,6 +24,7 @@ public class UserController {
 
     private final TokenGenerateService tokenService;
     private final UserRegisterService registerService;
+    private final UserUpdateService updateService;
 
     @PostMapping("signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,6 +39,19 @@ public class UserController {
                 .build();
         registerService.register(dto);
     }
+
+    @PatchMapping("profile")
+    public void updateProfile(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody UserUpdateRequest req) {
+        UserUpdate dto = UserUpdate
+                .builder()
+                .email(req.email())
+                .firstName(req.firstName())
+                .lastName(req.lastName())
+                .phone(req.phone())
+                .build();
+        updateService.update(user.userId(), dto);
+    }
+
 
     @PostMapping("token")
     public TokenResponse generateToken(@Valid @RequestBody TokenRequest req) {
