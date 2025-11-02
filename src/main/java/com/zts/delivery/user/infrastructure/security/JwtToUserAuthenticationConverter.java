@@ -25,12 +25,12 @@ public class JwtToUserAuthenticationConverter implements Converter<Jwt, UserAuth
         String givenName = (String) claims.getOrDefault("given_name", "");
         String name = familyName + givenName;
 
-        UserPrincipal principal = new UserPrincipal(
-                UUID.fromString(jwt.getSubject()),
-                (String) claims.getOrDefault("preferred_username", ""),
-                (String) claims.getOrDefault("email", ""),
-                name
-        );
+        UserPrincipal principal = UserPrincipal.builder()
+                .userId(UUID.fromString(jwt.getSubject()))
+                .username((String) claims.getOrDefault("preferred_username", ""))
+                .email((String) claims.getOrDefault("email", ""))
+                .name(name)
+                .build();
 
         Collection<GrantedAuthority> authorities = authoritiesConverter.convert(jwt);
         return UserAuthenticationToken.authenticated(authorities, principal);

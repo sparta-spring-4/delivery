@@ -20,7 +20,7 @@ public class UserController {
 
     @PostMapping("token")
     public TokenResponse generateToken(@Valid @RequestBody TokenRequest req) {
-        TokenInfo tokenInfo = tokenService.generate(req.userId(), req.password());
+        TokenInfo tokenInfo = tokenService.generate(req.username(), req.password());
         return TokenResponse.builder()
                 .accessToken(tokenInfo.accessToken())
                 .expiresIn(tokenInfo.expiresIn())
@@ -34,8 +34,8 @@ public class UserController {
     public UserResponse getProfile(@AuthenticationPrincipal UserPrincipal principal) {
         return UserResponse
                 .builder()
-                .id(principal.id())
                 .userId(principal.userId())
+                .username(principal.username())
                 .name(principal.name())
                 .email(principal.email())
                 .build();

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public record TokenRequest(
         @NotBlank
-        String userId,
+        String username,
         @NotBlank
         String password
 ) {
