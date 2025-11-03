@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @EnableConfigurationProperties(KeycloakProperties.class)
@@ -119,16 +120,11 @@ public class KeycloakUserRepository implements UserRepository {
     }
 
     @Override
-    public User addAddresses(UserId userId, List<UserAddress> userAddresses) {
+    public User addAddresses(UserId userId, List<UserAddress> newUserAddresses) {
         UserRepresentation representation = getUserRepresentation(userId);
-        Map<String, List<String>> attributes = Objects.requireNonNullElseGet(representation.getAttributes(), HashMap::new);
-
-        List<String> existingAddressJsons = attributes.getOrDefault("addresses", new ArrayList<>());
-        List<String> newAddressJsons = userAddressListConverter.convertToDatabaseColumn(userAddresses);
-        existingAddressJsons.addAll(newAddressJsons);
-        attributes.put("addresses", existingAddressJsons);
-        representation.setAttributes(attributes);
-        keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).update(representation);
+        List<UserAddress> existingAddresses = readAddressesFromKeycloak(representation);
+        List<UserAddress> finalAddresses = mergeAddresses(existingAddresses, newUserAddresses);
+        writeAddressesToKeycloak(userId, representation, finalAddresses);
 
         return findById(userId)
                 .orElseThrow(() -> new IllegalStateException("주소 정보 저장 후 유저 데이터를 찾을 수 없습니다. (내부 오류)"));
@@ -231,5 +227,51 @@ public class KeycloakUserRepository implements UserRepository {
 
     private List<RoleRepresentation> getRoleRepresentations(UserId id) {
         return usersResource.get(id.getId().toString()).roles().realmLevel().listAll();
+    }
+
+    /**
+     * Keycloak UserRepresentation의 속성에서 주소 목록(JSON)을 읽어 UserAddress 객체 목록으로 변환합니다.
+     */
+    private List<UserAddress> readAddressesFromKeycloak(UserRepresentation representation) {
+        Map<String, List<String>> attributes = representation.getAttributes();
+        if (attributes == null) {
+            return new ArrayList<>();
+        }
+        List<String> existingAddressJsons = attributes.getOrDefault("addresses", new ArrayList<>());
+        return userAddressListConverter.convertToEntityAttribute(existingAddressJsons);
+    }
+
+    /**
+     * 업데이트된 UserAddress 객체 목록을 Keycloak UserRepresentation에 JSON 문자열로 저장하고 Keycloak에 반영합니다.
+     */
+    private void writeAddressesToKeycloak(UserId userId, UserRepresentation representation, List<UserAddress> updatedAddresses) {
+        List<String> updatedAddressJsons = userAddressListConverter.convertToDatabaseColumn(updatedAddresses);
+
+        Map<String, List<String>> attributes = Objects.requireNonNullElseGet(representation.getAttributes(), HashMap::new);
+        attributes.put("addresses", updatedAddressJsons);
+        representation.setAttributes(attributes);
+
+        keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).update(representation);
+    }
+
+    /**
+     * 기존 주소 목록(existingAddresses)에 새 주소 목록(newAddresses)을 추가하거나
+     * alias가 겹칠 경우 새 주소로 덮어씁니다.
+     *
+     * @param existingAddresses 기존 주소 목록
+     * @param newAddresses 새로 추가/수정될 주소 목록
+     * @return alias를 기준으로 병합 및 덮어쓰기가 완료된 최종 주소 목록
+     */
+    private List<UserAddress> mergeAddresses(List<UserAddress> existingAddresses, List<UserAddress> newAddresses) {
+        Set<String> newAliases = newAddresses.stream()
+                .map(UserAddress::alias)
+                .collect(Collectors.toSet());
+
+        List<UserAddress> filteredAddresses = existingAddresses.stream()
+                .filter(existingAddress -> !newAliases.contains(existingAddress.alias()))
+                .collect(Collectors.toList());
+
+        filteredAddresses.addAll(newAddresses);
+        return filteredAddresses;
     }
 }
