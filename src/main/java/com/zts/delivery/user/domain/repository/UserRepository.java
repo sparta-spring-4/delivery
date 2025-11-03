@@ -1,8 +1,10 @@
 package com.zts.delivery.user.domain.repository;
 
 import com.zts.delivery.user.domain.User;
+import com.zts.delivery.user.domain.UserAddress;
 import com.zts.delivery.user.domain.UserId;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -18,4 +20,6 @@ public interface UserRepository {
     void updatePassword(UserId id, String password);
 
     void deleteById(UserId userId);
+
+    User addAddresses(UserId userId, List<UserAddress> userAddress);
 }
