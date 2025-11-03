@@ -12,7 +12,8 @@ public record UserProfile(
         UUID userId,
         String username,
         String email,
-        String name,
+        String firstName,
+        String lastName,
         String phone,
         UserStatus status,
         LocalDateTime createdAt,
@@ -23,7 +24,8 @@ public record UserProfile(
                 .userId(user.getUserId().getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .name(user.getLastName() + " " + user.getFirstName())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .phone(user.getPhone())
                 .status(user.getStatus())
                 .createdAt(user.getCreatedAt())

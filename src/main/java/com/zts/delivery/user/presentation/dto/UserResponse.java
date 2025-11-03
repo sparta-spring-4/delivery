@@ -21,7 +21,7 @@ public record UserResponse(
         return UserResponse.builder()
                 .userId(userProfile.userId())
                 .username(userProfile.username())
-                .name(userProfile.username())
+                .name(userProfile.lastName() + " " + userProfile.firstName())
                 .email(userProfile.email())
                 .phone(userProfile.phone())
                 .status(userProfile.status())
