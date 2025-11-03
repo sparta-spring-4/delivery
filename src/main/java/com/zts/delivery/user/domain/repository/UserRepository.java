@@ -21,5 +21,5 @@ public interface UserRepository {
 
     void deleteById(UserId userId);
 
-    User addAddresses(UserId userId, List<UserAddress> newAddresses);
+    User addAddresses(UserId userId, List<UserAddress> userAddresses);
 }
