@@ -1,12 +1,15 @@
 package com.zts.delivery.user.application.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.user.application.dto.KeycloakErrorResponse;
 import com.zts.delivery.user.infrastructure.keycloak.KeycloakProperties;
 import com.zts.delivery.user.application.dto.TokenInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -20,6 +23,7 @@ import org.springframework.web.client.RestClient;
 public class KeycloakTokenGenerateService implements TokenGenerateService {
 
     private final KeycloakProperties properties;
+    private final ObjectMapper objectMapper;
 
     @Override
     public TokenInfo generate(String username, String password) {
@@ -36,8 +40,11 @@ public class KeycloakTokenGenerateService implements TokenGenerateService {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(form)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                    KeycloakErrorResponse keycloakErrorResponse = objectMapper.readValue(response.getBody(), KeycloakErrorResponse.class);
+                    throw new ApplicationException(response.getStatusCode(), 3000, keycloakErrorResponse.errorDescription());
+                })
                 .toEntity(TokenInfo.class);
-
         if (res.getStatusCode().is2xxSuccessful()) {
             return res.getBody();
         }
