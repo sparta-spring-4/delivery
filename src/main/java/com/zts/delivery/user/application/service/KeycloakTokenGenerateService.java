@@ -42,7 +42,7 @@ public class KeycloakTokenGenerateService implements TokenGenerateService {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
                     KeycloakErrorResponse keycloakErrorResponse = objectMapper.readValue(response.getBody(), KeycloakErrorResponse.class);
-                    throw new ApplicationException(response.getStatusCode(), 3000, keycloakErrorResponse.errorDescription());
+                    throw new ApplicationException(response.getStatusCode(), "TOKEN_ISSUE_ERROR", keycloakErrorResponse.errorDescription());
                 })
                 .toEntity(TokenInfo.class);
         if (res.getStatusCode().is2xxSuccessful()) {
