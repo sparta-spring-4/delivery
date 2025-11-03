@@ -2,6 +2,7 @@ package com.zts.delivery.user.application.service;
 
 import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.user.application.dto.RegisterUserAddress;
 import com.zts.delivery.user.application.dto.UserProfile;
 import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
@@ -59,7 +60,10 @@ public class UserService {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public UserProfile addUserAddresses(UserId userId, List<UserAddress> userAddresses) {
+    public UserProfile addUserAddresses(UserId userId, List<RegisterUserAddress> registerUserAddresses) {
+        List<UserAddress> userAddresses = registerUserAddresses.stream()
+                .map(it -> it.toUserAddress(UUID.randomUUID()))
+                .toList();
         User user = userRepository.addAddresses(userId, userAddresses);
         return UserProfile.of(user);
     }

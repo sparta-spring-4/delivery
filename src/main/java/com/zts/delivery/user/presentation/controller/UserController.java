@@ -6,7 +6,6 @@ import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
 import com.zts.delivery.user.application.service.TokenGenerateService;
 import com.zts.delivery.user.application.service.UserService;
-import com.zts.delivery.user.domain.UserAddress;
 import com.zts.delivery.user.domain.UserId;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import com.zts.delivery.user.presentation.dto.*;
@@ -84,9 +83,9 @@ public class UserController {
         userService.withdraw(UserId.of(principal.userId()));
     }
 
-    @PostMapping("/add-address")
-    public UserResponse addUserAddress(@AuthenticationPrincipal UserPrincipal principal, @RequestBody UserAddress address) {
-        UserProfile userProfile = userService.addUserAddresses(UserId.of(principal.userId()), List.of(address));
+    @PostMapping("/address")
+    public UserResponse addUserAddress(@AuthenticationPrincipal UserPrincipal principal, @RequestBody RegisterUserAddressRequest address) {
+        UserProfile userProfile = userService.addUserAddresses(UserId.of(principal.userId()), List.of(address.toServiceDto()));
         return UserResponse.of(userProfile);
     }
 
