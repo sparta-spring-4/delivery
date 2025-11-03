@@ -7,7 +7,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 @Getter
 public class ApplicationException extends HttpStatusCodeException {
 
-    private int code;
+    private String code;
     private String message;
 
     public ApplicationException(ErrorCode errorCode) {
@@ -22,7 +22,7 @@ public class ApplicationException extends HttpStatusCodeException {
         this.message = message;
     }
 
-    public ApplicationException(HttpStatusCode statusCode, int code, String message) {
+    public ApplicationException(HttpStatusCode statusCode, String code, String message) {
         super(statusCode);
         this.code = code;
         this.message = message;
