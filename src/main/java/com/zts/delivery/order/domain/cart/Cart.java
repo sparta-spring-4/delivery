@@ -44,12 +44,26 @@ public class Cart {
     private LocalDateTime createdAt;
 
     @Builder
-    public Cart(UserId userId, CartItem item, int quantity) {
+    public Cart(CartId cartId, UserId userId, CartItem item, int quantity) {
         this.userId = userId;
         this.quantity = quantity;
         setCartItem(item);
         calculateTotalPrice();
     }
+
+    public static Cart create(UserId userId, CartItem item, int quantity) {
+
+        Cart cart = Cart.builder()
+            .userId(userId)
+            .item(item)
+            .quantity(quantity)
+            .build();
+
+        cart.id = CartId.of();
+
+        return cart;
+    }
+
 
     // 장바구니 상품이 없다면 담을 수 없음
     private void setCartItem(CartItem item) {
