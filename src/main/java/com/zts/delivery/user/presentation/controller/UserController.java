@@ -6,6 +6,7 @@ import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
 import com.zts.delivery.user.application.service.TokenGenerateService;
 import com.zts.delivery.user.application.service.UserService;
+import com.zts.delivery.user.domain.UserAddress;
 import com.zts.delivery.user.domain.UserId;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import com.zts.delivery.user.presentation.dto.*;
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -80,6 +82,12 @@ public class UserController {
     @DeleteMapping
     public void withdraw(@AuthenticationPrincipal UserPrincipal principal) {
         userService.withdraw(UserId.of(principal.userId()));
+    }
+
+    @PostMapping("/add-address")
+    public UserResponse addUserAddress(@AuthenticationPrincipal UserPrincipal principal, @RequestBody UserAddress address) {
+        UserProfile userProfile = userService.addUserAddresses(UserId.of(principal.userId()), List.of(address));
+        return UserResponse.of(userProfile);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

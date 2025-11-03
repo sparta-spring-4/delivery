@@ -1,9 +1,7 @@
 package com.zts.delivery.user.domain.repository;
 
-import com.zts.delivery.user.domain.UserRole;
-import com.zts.delivery.user.domain.User;
-import com.zts.delivery.user.domain.UserId;
-import com.zts.delivery.user.domain.UserStatus;
+import com.zts.delivery.user.domain.*;
+import com.zts.delivery.user.domain.converter.UserAddressListToJsonListConverter;
 import com.zts.delivery.user.infrastructure.keycloak.KeycloakProperties;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
@@ -26,14 +24,16 @@ public class KeycloakUserRepository implements UserRepository {
 
     private final KeycloakProperties properties;
     private final Keycloak keycloak;
+    private final UserAddressListToJsonListConverter userAddressListConverter;
 
     private final UsersResource usersResource;
     private static final String ROLE_PREFIX = "ROLE_";
 
-    public KeycloakUserRepository(KeycloakProperties properties, Keycloak keycloak) {
+    public KeycloakUserRepository(KeycloakProperties properties, Keycloak keycloak, UserAddressListToJsonListConverter userAddressListConverter) {
         this.properties = properties;
         this.keycloak = keycloak;
         this.usersResource = keycloak.realm(properties.getRealm()).users();
+        this.userAddressListConverter = userAddressListConverter;
     }
 
     @Override
@@ -48,6 +48,9 @@ public class KeycloakUserRepository implements UserRepository {
                     .map(role -> role.substring(ROLE_PREFIX.length()))
                     .map(UserRole::valueOf)
                     .toList();
+
+            List<String> userAddressesJson = attributes.getOrDefault("addresses", Collections.emptyList());
+            List<UserAddress> userAddresses = userAddressListConverter.convertToEntityAttribute(userAddressesJson);
 
             User user = User.builder()
                     .username(representation.getUsername())
@@ -66,6 +69,7 @@ public class KeycloakUserRepository implements UserRepository {
                             parseLocalDateTime(attributes.get("deletedAt"))
                     )
                     .status(UserStatus.valueOf(attributes.get("status").getFirst()))
+                    .addresses(userAddresses)
                     .roles(userRoles).build();
             return Optional.of(user);
         } catch (NotFoundException e) {
@@ -114,6 +118,22 @@ public class KeycloakUserRepository implements UserRepository {
         keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).update(representation);
     }
 
+    @Override
+    public User addAddresses(UserId userId, List<UserAddress> userAddresses) {
+        UserRepresentation representation = getUserRepresentation(userId);
+        Map<String, List<String>> attributes = Objects.requireNonNullElseGet(representation.getAttributes(), HashMap::new);
+
+        List<String> existingAddressJsons = attributes.getOrDefault("addresses", new ArrayList<>());
+        List<String> newAddressJsons = userAddressListConverter.convertToDatabaseColumn(userAddresses);
+        existingAddressJsons.addAll(newAddressJsons);
+        attributes.put("addresses", existingAddressJsons);
+        representation.setAttributes(attributes);
+        keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).update(representation);
+
+        return findById(userId)
+                .orElseThrow(() -> new IllegalStateException("주소 정보 저장 후 유저 데이터를 찾을 수 없습니다. (내부 오류)"));
+    }
+
     private User saveUser(User user) {
         UserRepresentation userRepresentation = createUserRepresentation(user);
         setUserAttribute(userRepresentation, user);
@@ -138,6 +158,7 @@ public class KeycloakUserRepository implements UserRepository {
         return findById(user.getUserId())
                 .orElseThrow(() -> new IllegalStateException("업데이트 후 사용자를 찾을 수 없습니다. (데이터 무결성 문제 발생)"));
     }
+
     private LocalDateTime parseLocalDateTime(List<String> localDateTimeStr) {
         return !Objects.isNull(localDateTimeStr) && !localDateTimeStr.isEmpty() ? LocalDateTime.parse(localDateTimeStr.getFirst()) : null;
     }
