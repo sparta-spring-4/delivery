@@ -2,7 +2,7 @@ package com.zts.delivery.order.domain.cart;
 
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
-import com.zts.delivery.item.domain.ItemId;
+import com.zts.delivery.menu.domain.ItemId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;

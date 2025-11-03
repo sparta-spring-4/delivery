@@ -1,6 +1,6 @@
-package com.zts.delivery.item.infrastructure.converter;
+package com.zts.delivery.menu.infrastructure.converter;
 
-import com.zts.delivery.item.domain.Stock;
+import com.zts.delivery.menu.domain.Stock;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
