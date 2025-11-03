@@ -86,7 +86,7 @@ public class Item extends BaseEntity {
         this.stock = stock;
 
         if (stock.getValue() == 0 || status == ItemStatus.OUT_OF_STOCK) {
-            outOfStock = false;
+            outOfStock = true;
         }
     }
 
@@ -113,17 +113,14 @@ public class Item extends BaseEntity {
     public void removeOptionAll() {
         if (itemOptions == null) return;
 
-        itemOptions.forEach(o -> itemOptions.remove(o));
+        itemOptions.clear();
     }
     /**
      * 상품 수량 + 옵션 번호, 수량으로 금액 계산
-     * @param itemCnt
-     * @param options
-     * @return
      */
 
     public Price getTotal(int itemCnt, Map<Integer, Integer> options) {
-        Price totalPrice = price.add(price.multiply(itemCnt));
+        Price totalPrice = price.multiply(itemCnt);
 
         if (itemOptions != null && options != null) {
             options.forEach((optionIdx, optionCnt) -> {

@@ -16,14 +16,14 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StoreId {
     @Column(length=45, name="store_id")
-    public UUID id;
+    private UUID id;
 
     public StoreId(UUID id) {
         this.id = id;
     }
 
     public static StoreId of() {
-        return StoreId.of(UUID.randomUUID());
+        return StoreId.of(java.util.UUID.randomUUID());
     }
 
     public static StoreId of(UUID id) {

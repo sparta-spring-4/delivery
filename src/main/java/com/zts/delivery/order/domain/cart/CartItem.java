@@ -3,6 +3,7 @@ package com.zts.delivery.order.domain.cart;
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
 import com.zts.delivery.menu.domain.ItemId;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
@@ -19,7 +20,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CartItem {
     @Embedded
-    @Column(name="item_id")
+    @AttributeOverride(name = "value", column = @Column(name = "item_id"))
     private ItemId id;
 
     @Column(length=60)
