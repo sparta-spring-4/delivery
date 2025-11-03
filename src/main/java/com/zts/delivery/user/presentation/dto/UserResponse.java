@@ -1,5 +1,6 @@
 package com.zts.delivery.user.presentation.dto;
 
+import com.zts.delivery.user.application.dto.UserProfile;
 import com.zts.delivery.user.domain.UserStatus;
 import lombok.Builder;
 
@@ -16,4 +17,15 @@ public record UserResponse(
         UserStatus status,
         LocalDateTime createdAt
 ) {
+    public static UserResponse of(UserProfile userProfile) {
+        return UserResponse.builder()
+                .userId(userProfile.userId())
+                .username(userProfile.username())
+                .name(userProfile.username())
+                .email(userProfile.email())
+                .phone(userProfile.phone())
+                .status(userProfile.status())
+                .createdAt(userProfile.createdAt())
+                .build();
+    }
 }
