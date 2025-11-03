@@ -1,9 +1,9 @@
-package com.zts.delivery.item.domain;
+package com.zts.delivery.menu.domain;
 
 import com.zts.delivery.global.persistence.common.BaseEntity;
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
-import com.zts.delivery.item.infrastructure.converter.StockConverter;
+import com.zts.delivery.menu.infrastructure.converter.StockConverter;
 import com.zts.delivery.store.StoreId;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;

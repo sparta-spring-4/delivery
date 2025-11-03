@@ -1,4 +1,4 @@
-package com.zts.delivery.item.domain;
+package com.zts.delivery.menu.domain;
 
 public enum ItemStatus {
     IN_STOCK,

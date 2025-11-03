@@ -1,4 +1,4 @@
-package com.zts.delivery.item.domain;
+package com.zts.delivery.menu.domain;
 
 import com.zts.delivery.global.persistence.Price;
 import jakarta.persistence.Column;
