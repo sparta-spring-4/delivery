@@ -16,4 +16,6 @@ public interface UserRepository {
     boolean existsByUsername(String username);
 
     void updatePassword(UserId id, String password);
+
+    void deleteById(UserId userId);
 }

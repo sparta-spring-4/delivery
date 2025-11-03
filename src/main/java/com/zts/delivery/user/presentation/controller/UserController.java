@@ -6,6 +6,8 @@ import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
 import com.zts.delivery.user.application.service.TokenGenerateService;
 import com.zts.delivery.user.application.service.UserService;
+import com.zts.delivery.user.domain.User;
+import com.zts.delivery.user.domain.UserId;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import com.zts.delivery.user.presentation.dto.*;
 import jakarta.validation.Valid;
@@ -81,6 +83,11 @@ public class UserController {
                 .status(userProfile.status())
                 .createdAt(userProfile.createdAt())
                 .build();
+    }
+
+    @DeleteMapping
+    public void withdraw(@AuthenticationPrincipal UserPrincipal principal) {
+        userService.withdraw(UserId.of(principal.userId()));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

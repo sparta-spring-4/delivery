@@ -102,6 +102,18 @@ public class KeycloakUserRepository implements UserRepository {
         keycloak.realm(properties.getRealm()).users().get(id.getId().toString()).resetPassword(passwordCred);
     }
 
+    @Override
+    public void deleteById(UserId userId) {
+        UserRepresentation representation = getUserRepresentation(userId);
+        Map<String, List<String>> attributes = Objects.requireNonNullElseGet(representation.getAttributes(), HashMap::new);
+        attributes.put("status", List.of(UserStatus.WITHDRAW.name()));
+        attributes.put("updatedAt", List.of(LocalDateTime.now().toString()));
+        attributes.put("deletedAt", List.of(LocalDateTime.now().toString()));
+        representation.setAttributes(attributes);
+        representation.setEnabled(false);
+        keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).update(representation);
+    }
+
     private User saveUser(User user) {
         UserRepresentation userRepresentation = createUserRepresentation(user);
         setUserAttribute(userRepresentation, user);
