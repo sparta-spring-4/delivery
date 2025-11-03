@@ -9,6 +9,7 @@ import com.zts.delivery.user.domain.UserRole;
 import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserId;
 import com.zts.delivery.user.domain.repository.UserRepository;
+import com.zts.delivery.user.presentation.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void update(UUID userId, UserUpdate dto, LocalDateTime updatedAt) {
+    public UserProfile update(UUID userId, UserUpdate dto, LocalDateTime updatedAt) {
         UserProfile foundUser = getUserProfile(userId);
         if (dto.email() != null && !dto.email().equals(foundUser.email())) {
             checkDuplicatedEmail(dto.email());
@@ -43,7 +44,9 @@ public class UserService {
                 .phone(dto.phone())
                 .updatedAt(updatedAt)
                 .build();
-        userRepository.save(user);
+
+        User updatedUSer = userRepository.save(user);
+        return UserProfile.of(updatedUSer);
     }
 
     public void updatePassword(UUID userId, String password) {

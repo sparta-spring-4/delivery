@@ -6,7 +6,6 @@ import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
 import com.zts.delivery.user.application.service.TokenGenerateService;
 import com.zts.delivery.user.application.service.UserService;
-import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserId;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import com.zts.delivery.user.presentation.dto.*;
@@ -43,7 +42,7 @@ public class UserController {
     }
 
     @PatchMapping("profile")
-    public void updateProfile(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody UserUpdateRequest req) {
+    public UserResponse updateProfile(@AuthenticationPrincipal UserPrincipal user, @Valid @RequestBody UserUpdateRequest req) {
         UserUpdate dto = UserUpdate
                 .builder()
                 .email(req.email())
@@ -51,7 +50,8 @@ public class UserController {
                 .lastName(req.lastName())
                 .phone(req.phone())
                 .build();
-        userService.update(user.userId(), dto, LocalDateTime.now());
+        UserProfile userProfile = userService.update(user.userId(), dto, LocalDateTime.now());
+        return UserResponse.of(userProfile);
     }
 
     @PatchMapping("password")
@@ -74,15 +74,7 @@ public class UserController {
     @GetMapping("/profile")
     public UserResponse getProfile(@AuthenticationPrincipal UserPrincipal principal) {
         UserProfile userProfile = userService.getUserProfile(principal.userId());
-        return UserResponse.builder()
-                .userId(userProfile.userId())
-                .username(userProfile.username())
-                .name(userProfile.username())
-                .email(userProfile.email())
-                .phone(userProfile.phone())
-                .status(userProfile.status())
-                .createdAt(userProfile.createdAt())
-                .build();
+        return UserResponse.of(userProfile);
     }
 
     @DeleteMapping
@@ -94,14 +86,6 @@ public class UserController {
     @GetMapping("/profile/{userId}")
     public UserResponse userProfile(@PathVariable("userId") String userId) {
         UserProfile userProfile = userService.getUserProfile(UUID.fromString(userId));
-        return UserResponse.builder()
-                .userId(userProfile.userId())
-                .username(userProfile.username())
-                .name(userProfile.username())
-                .email(userProfile.email())
-                .phone(userProfile.phone())
-                .status(userProfile.status())
-                .createdAt(userProfile.createdAt())
-                .build();
+        return UserResponse.of(userProfile);
     }
 }
