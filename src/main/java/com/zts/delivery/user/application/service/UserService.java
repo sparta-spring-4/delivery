@@ -5,13 +5,14 @@ import com.zts.delivery.infrastructure.execption.ErrorCode;
 import com.zts.delivery.user.application.dto.UserProfile;
 import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
-import com.zts.delivery.user.domain.Role;
+import com.zts.delivery.user.domain.UserRole;
 import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserId;
 import com.zts.delivery.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,25 +22,26 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public void register(UserRegister dto) {
+    public void register(UserRegister dto, LocalDateTime registeredAt) {
         checkDuplicatedUsername(dto.username());
         checkDuplicatedEmail(dto.email());
-        User user = dto.toUser(List.of(Role.USER));
+        User user = dto.toUser(List.of(UserRole.USER), registeredAt);
         userRepository.save(user);
     }
 
-    public void update(UUID userId, UserUpdate dto) {
+    public void update(UUID userId, UserUpdate dto, LocalDateTime updatedAt) {
         UserProfile foundUser = getUserProfile(userId);
         if (dto.email() != null && !dto.email().equals(foundUser.email())) {
             checkDuplicatedEmail(dto.email());
         }
 
         User user = User.builder()
-                .id(UserId.of(userId))
+                .userId(UserId.of(userId))
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .email(dto.email())
                 .phone(dto.phone())
+                .updatedAt(updatedAt)
                 .build();
         userRepository.save(user);
     }
