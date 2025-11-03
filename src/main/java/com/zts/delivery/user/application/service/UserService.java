@@ -67,4 +67,8 @@ public class UserService {
             throw new ApplicationException(ErrorCode.DUPLICATED_EMAIL);
         }
     }
+
+    public void withdraw(UserId userId) {
+        userRepository.deleteById(userId);
+    }
 }
