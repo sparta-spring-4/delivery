@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class UserController {
                 .lastName(req.lastName())
                 .phone(req.phone())
                 .build();
-        userService.register(dto);
+        userService.register(dto, LocalDateTime.now());
     }
 
     @PatchMapping("profile")
@@ -48,7 +49,7 @@ public class UserController {
                 .lastName(req.lastName())
                 .phone(req.phone())
                 .build();
-        userService.update(user.userId(), dto);
+        userService.update(user.userId(), dto, LocalDateTime.now());
     }
 
     @PatchMapping("password")
@@ -77,6 +78,8 @@ public class UserController {
                 .name(userProfile.username())
                 .email(userProfile.email())
                 .phone(userProfile.phone())
+                .status(userProfile.status())
+                .createdAt(userProfile.createdAt())
                 .build();
     }
 
@@ -90,6 +93,8 @@ public class UserController {
                 .name(userProfile.username())
                 .email(userProfile.email())
                 .phone(userProfile.phone())
+                .status(userProfile.status())
+                .createdAt(userProfile.createdAt())
                 .build();
     }
 }

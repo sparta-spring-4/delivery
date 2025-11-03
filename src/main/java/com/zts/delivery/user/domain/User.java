@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -13,7 +14,7 @@ import java.util.List;
 public class User {
 
     @Setter
-    private UserId id;
+    private UserId userId;
 
     private String username;
 
@@ -27,6 +28,13 @@ public class User {
 
     private String email;
 
-    private List<Role> roles;
+    private UserStatus status;
 
+    private List<UserRole> roles;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    private LocalDateTime deletedAt;
 }

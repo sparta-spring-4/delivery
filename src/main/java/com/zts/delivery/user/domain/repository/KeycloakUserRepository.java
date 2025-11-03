@@ -1,8 +1,9 @@
 package com.zts.delivery.user.domain.repository;
 
-import com.zts.delivery.user.domain.Role;
+import com.zts.delivery.user.domain.UserRole;
 import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserId;
+import com.zts.delivery.user.domain.UserStatus;
 import com.zts.delivery.user.infrastructure.keycloak.KeycloakProperties;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
@@ -16,6 +17,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
@@ -26,6 +28,7 @@ public class KeycloakUserRepository implements UserRepository {
     private final Keycloak keycloak;
 
     private final UsersResource usersResource;
+    private static final String ROLE_PREFIX = "ROLE_";
 
     public KeycloakUserRepository(KeycloakProperties properties, Keycloak keycloak) {
         this.properties = properties;
@@ -36,16 +39,34 @@ public class KeycloakUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(UserId id) {
         try {
-            UserRepresentation representation = getUserProfile(id.getId());
+            UserRepresentation representation = getUserRepresentation(id);
+            Map<String, List<String>> attributes = representation.getAttributes();
+
+            List<UserRole> userRoles = getRoleRepresentations(id).stream()
+                    .map(RoleRepresentation::getName)
+                    .filter(role -> role.startsWith(ROLE_PREFIX))
+                    .map(role -> role.substring(ROLE_PREFIX.length()))
+                    .map(UserRole::valueOf)
+                    .toList();
+
             User user = User.builder()
                     .username(representation.getUsername())
-                    .id(UserId.of(UUID.fromString(representation.getId())))
+                    .userId(UserId.of(UUID.fromString(representation.getId())))
                     .firstName(representation.getFirstName())
                     .lastName(representation.getLastName())
                     .email(representation.getEmail())
-                    .phone(representation.getAttributes().get("phone").getFirst())
-                    .roles(representation.getRealmRoles().stream().map(Role::valueOf).toList())
-                    .build();
+                    .phone(attributes.get("phone").getFirst())
+                    .createdAt(
+                            parseLocalDateTime(attributes.get("createdAt"))
+                    )
+                    .updatedAt(
+                            parseLocalDateTime(attributes.get("updatedAt"))
+                    )
+                    .deletedAt(
+                            parseLocalDateTime(attributes.get("deletedAt"))
+                    )
+                    .status(UserStatus.valueOf(attributes.get("status").getFirst()))
+                    .roles(userRoles).build();
             return Optional.of(user);
         } catch (NotFoundException e) {
             return Optional.empty();
@@ -54,7 +75,7 @@ public class KeycloakUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        if (user.getId() != null) {
+        if (user.getUserId() != null) {
             return updateUser(user);
         }
         return saveUser(user);
@@ -89,23 +110,26 @@ public class KeycloakUserRepository implements UserRepository {
 
         String userId = CreatedResponseUtil.getCreatedId(response);
         setPassword(userId, user.getPassword());
-        setRole(userId, Role.USER);
+        setRole(userId, UserRole.USER);
 
         return findById(UserId.of(UUID.fromString(userId)))
                 .orElseThrow(() -> new IllegalStateException("Keycloak 사용자 생성 후 데이터를 찾을 수 없습니다. (내부 오류)"));
     }
 
     private User updateUser(User user) {
-        UUID userId = user.getId().getId();
-        UserRepresentation userRepresentation = getUserProfile(userId);
+        UserRepresentation userRepresentation = getUserRepresentation(user.getUserId());
         updateFirstName(userRepresentation, user.getFirstName());
         updateLastName(userRepresentation, user.getLastName());
         updateEmail(userRepresentation, user.getEmail());
         updateAttributes(userRepresentation, user);
-        keycloak.realm(properties.getRealm()).users().get(userId.toString()).update(userRepresentation);
-        return findById(UserId.of(userId))
+        keycloak.realm(properties.getRealm()).users().get(user.getUserId().getId().toString()).update(userRepresentation);
+        return findById(user.getUserId())
                 .orElseThrow(() -> new IllegalStateException("업데이트 후 사용자를 찾을 수 없습니다. (데이터 무결성 문제 발생)"));
     }
+    private LocalDateTime parseLocalDateTime(List<String> localDateTimeStr) {
+        return !Objects.isNull(localDateTimeStr) && !localDateTimeStr.isEmpty() ? LocalDateTime.parse(localDateTimeStr.getFirst()) : null;
+    }
+
 
     private UserRepresentation createUserRepresentation(User user) {
         UserRepresentation userRepresentation = new UserRepresentation();
@@ -121,6 +145,9 @@ public class KeycloakUserRepository implements UserRepository {
     private void setUserAttribute(UserRepresentation userRepresentation, User user) {
         Map<String, List<String>> attributes = new HashMap<>();
         attributes.put("phone", List.of(user.getPhone()));
+        attributes.put("createdAt", List.of(user.getCreatedAt().toString()));
+        attributes.put("updatedAt", List.of(user.getUpdatedAt().toString()));
+        attributes.put("status", List.of(user.getStatus().name()));
         userRepresentation.setAttributes(attributes);
     }
 
@@ -132,8 +159,8 @@ public class KeycloakUserRepository implements UserRepository {
         usersResource.get(userId).resetPassword(passwordCred);
     }
 
-    private void setRole(String userId, Role role) {
-        RoleRepresentation userRole = keycloak.realm(properties.getRealm()).roles().get("ROLE_" + role.name()).toRepresentation();
+    private void setRole(String userId, UserRole role) {
+        RoleRepresentation userRole = keycloak.realm(properties.getRealm()).roles().get(ROLE_PREFIX + role.name()).toRepresentation();
         usersResource.get(userId).roles().realmLevel().add(List.of(userRole));
     }
 
@@ -161,10 +188,15 @@ public class KeycloakUserRepository implements UserRepository {
         if (StringUtils.hasText(user.getPhone())) {
             attributes.put("phone", List.of(user.getPhone()));
         }
+        attributes.put("updatedAt", List.of(user.getUpdatedAt().toString()));
         userRepresentation.setAttributes(attributes);
     }
 
-    private UserRepresentation getUserProfile(UUID userId) {
-        return usersResource.get(userId.toString()).toRepresentation();
+    private UserRepresentation getUserRepresentation(UserId userId) {
+        return usersResource.get(userId.getId().toString()).toRepresentation();
+    }
+
+    private List<RoleRepresentation> getRoleRepresentations(UserId id) {
+        return usersResource.get(id.getId().toString()).roles().realmLevel().listAll();
     }
 }

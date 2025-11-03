@@ -1,8 +1,10 @@
 package com.zts.delivery.user.application.dto;
 
 import com.zts.delivery.user.domain.User;
+import com.zts.delivery.user.domain.UserStatus;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
@@ -11,15 +13,21 @@ public record UserProfile(
         String username,
         String email,
         String name,
-        String phone
+        String phone,
+        UserStatus status,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {
     public static UserProfile of(User user) {
         return UserProfile.builder()
-                .userId(user.getId().getId())
+                .userId(user.getUserId().getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .name(user.getLastName() + " " + user.getFirstName())
                 .phone(user.getPhone())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 }
