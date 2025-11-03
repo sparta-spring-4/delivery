@@ -1,4 +1,4 @@
-package com.zts.delivery.menu.domain;
+package com.zts.delivery.item.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -21,6 +21,10 @@ public class ItemId implements Serializable {
 
     public ItemId(UUID id) {
         this.id = id;
+    }
+
+    public static ItemId of() {
+        return ItemId.of(UUID.randomUUID());
     }
 
     public static ItemId of(UUID id) {
