@@ -16,7 +16,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class CartId implements Serializable {
-    @Column(length = 45, name = "cart_id" )
+    @Column(columnDefinition = "BINARY(16)" ,length = 45, name = "cart_id" )
     private UUID id;
 
     public CartId(UUID id) {

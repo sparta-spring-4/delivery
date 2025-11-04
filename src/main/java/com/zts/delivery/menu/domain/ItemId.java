@@ -16,7 +16,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ItemId implements Serializable {
-    @Column(name="item_id")
+    @Column(name="item_id", columnDefinition = "BINARY(16)")
     private UUID id;
 
     public ItemId(UUID id) {
