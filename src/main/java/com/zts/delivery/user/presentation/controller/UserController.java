@@ -1,9 +1,6 @@
 package com.zts.delivery.user.presentation.controller;
 
-import com.zts.delivery.user.application.dto.TokenInfo;
-import com.zts.delivery.user.application.dto.UserProfile;
-import com.zts.delivery.user.application.dto.UserRegister;
-import com.zts.delivery.user.application.dto.UserUpdate;
+import com.zts.delivery.user.application.dto.*;
 import com.zts.delivery.user.application.service.TokenGenerateService;
 import com.zts.delivery.user.application.service.UserService;
 import com.zts.delivery.user.domain.UserId;
@@ -17,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -83,9 +81,11 @@ public class UserController {
     }
 
     @PostMapping("/address")
-    public UserResponse addUserAddress(@AuthenticationPrincipal UserPrincipal principal, @RequestBody RegisterUserAddressRequest address) {
-        UserProfile userProfile = userService.addUserAddresses(principal.userId(), address.toServiceDto());
-        return UserResponse.of(userProfile);
+    public List<UserAddressResponse> addUserAddress(@AuthenticationPrincipal UserPrincipal principal, @RequestBody RegisterUserAddressRequest address) {
+        List<UserAddressInfo> userAddressInfos = userService.addUserAddresses(principal.userId(), address.toServiceDto());
+        return userAddressInfos.stream()
+                .map(UserAddressResponse::of)
+                .toList();
     }
 
     @DeleteMapping("/address/{addressId}")

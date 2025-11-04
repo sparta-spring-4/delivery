@@ -119,7 +119,7 @@ public class KeycloakUserRepository implements UserRepository {
     }
 
     @Override
-    public User addAddress(UserId userId, UserAddress userAddress) {
+    public List<UserAddress> addAddress(UserId userId, UserAddress userAddress) {
         UserRepresentation representation = getUserRepresentation(userId);
         Map<String, List<String>> attributes = Objects.requireNonNullElseGet(representation.getAttributes(), HashMap::new);
 
@@ -131,7 +131,8 @@ public class KeycloakUserRepository implements UserRepository {
         keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).update(representation);
 
         return findById(userId)
-                .orElseThrow(() -> new IllegalStateException("주소 정보 저장 후 유저 데이터를 찾을 수 없습니다. (내부 오류)"));
+                .map(User::getAddresses)
+                .orElseThrow(() -> new IllegalStateException("주소 정보 저장 후 주소 데이터를 찾을 수 없습니다. (내부 오류)"));
     }
 
     @Override

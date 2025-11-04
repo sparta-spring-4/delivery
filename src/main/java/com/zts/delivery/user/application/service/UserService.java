@@ -2,10 +2,7 @@ package com.zts.delivery.user.application.service;
 
 import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.infrastructure.execption.ErrorCode;
-import com.zts.delivery.user.application.dto.RegisterUserAddress;
-import com.zts.delivery.user.application.dto.UserProfile;
-import com.zts.delivery.user.application.dto.UserRegister;
-import com.zts.delivery.user.application.dto.UserUpdate;
+import com.zts.delivery.user.application.dto.*;
 import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserAddress;
 import com.zts.delivery.user.domain.UserId;
@@ -60,10 +57,12 @@ public class UserService {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public UserProfile addUserAddresses(UserId userId, RegisterUserAddress registerUserAddress) {
+    public List<UserAddressInfo> addUserAddresses(UserId userId, RegisterUserAddress registerUserAddress) {
         UserAddress userAddress = registerUserAddress.toUserAddress(UUID.randomUUID());
-        User user = userRepository.addAddress(userId, userAddress);
-        return UserProfile.of(user);
+        List<UserAddress> userAddresses = userRepository.addAddress(userId, userAddress);
+        return userAddresses.stream()
+                .map(UserAddressInfo::of)
+                .toList();
     }
 
     private void checkDuplicatedUsername(String username) {
