@@ -1,7 +1,6 @@
 package com.zts.delivery.user.presentation.dto;
 
 import com.zts.delivery.user.application.dto.UserProfile;
-import com.zts.delivery.user.domain.UserAddress;
 import com.zts.delivery.user.domain.UserStatus;
 import lombok.Builder;
 
@@ -17,10 +16,14 @@ public record UserResponse(
         String name,
         String phone,
         UserStatus status,
-        List<UserAddress> addresses,
+        List<UserAddressResponse> addresses,
         LocalDateTime createdAt
 ) {
     public static UserResponse of(UserProfile userProfile) {
+        List<UserAddressResponse> userAddress = userProfile.addresses().stream()
+                .map(UserAddressResponse::of)
+                .toList();
+
         return UserResponse.builder()
                 .userId(userProfile.userId())
                 .username(userProfile.username())
@@ -28,7 +31,7 @@ public record UserResponse(
                 .email(userProfile.email())
                 .phone(userProfile.phone())
                 .status(userProfile.status())
-                .addresses(userProfile.addresses())
+                .addresses(userAddress)
                 .createdAt(userProfile.createdAt())
                 .build();
     }
