@@ -43,7 +43,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer defaultWebSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()) // 정적 리소스 무시
-                .requestMatchers("/swagger-ui/**"); // swagger-ui 접근 무시
+                .requestMatchers("/api-docs/**","/swagger-ui/**"); // swagger-ui 접근 무시
     }
 
     /**
@@ -55,6 +55,6 @@ public class SecurityConfig {
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()) // 정적 리소스 무시
                 .requestMatchers(PathRequest.toH2Console()) // H2 콘솔 접근 무시 (개발용)
-                .requestMatchers("/swagger-ui/**"); // swagger-ui 접근 무시
+                .requestMatchers("/api-docs/**","/swagger-ui/**"); // swagger-ui 접근 무시
     }
 }
