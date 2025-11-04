@@ -12,16 +12,10 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
     // 1. (?=.*[a-zA-Z]): 최소 1개의 문자(대/소문자) 포함
     // 2. (?=.*\d): 최소 1개의 숫자 포함
     // 3. (?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]): 최소 1개의 특수 문자 포함
-    // 4. .{8, 12}: 8자 이상, 12자 이하
+    // 4. .{8,12}: 8자 이상, 12자 이하
     private static final String PASSWORD_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,12}$";
 
-    private Pattern pattern;
-
-
-    @Override
-    public void initialize(Password constraintAnnotation) {
-        this.pattern = Pattern.compile(PASSWORD_REGEX);
-    }
+    private static final Pattern PATTERN = Pattern.compile(PASSWORD_REGEX);
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
@@ -29,6 +23,6 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
             return true;
         }
 
-        return pattern.matcher(value).matches();
+        return PATTERN.matcher(value).matches();
     }
 }
