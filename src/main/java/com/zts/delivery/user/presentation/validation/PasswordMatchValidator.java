@@ -1,4 +1,4 @@
-package com.zts.delivery.user.presentation.vaidation;
+package com.zts.delivery.user.presentation.validation;
 
 import com.zts.delivery.user.presentation.dto.PasswordContainer;
 import jakarta.validation.ConstraintValidator;

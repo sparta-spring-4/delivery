@@ -1,4 +1,4 @@
-package com.zts.delivery.user.presentation.vaidation;
+package com.zts.delivery.user.presentation.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

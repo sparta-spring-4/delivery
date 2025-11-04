@@ -1,6 +1,6 @@
 package com.zts.delivery.user.presentation.dto;
 
-import com.zts.delivery.user.presentation.vaidation.Phone;
+import com.zts.delivery.user.presentation.validation.Phone;
 import jakarta.validation.constraints.Email;
 
 public record UserUpdateRequest(

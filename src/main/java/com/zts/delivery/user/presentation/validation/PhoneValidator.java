@@ -1,4 +1,4 @@
-package com.zts.delivery.user.presentation.vaidation;
+package com.zts.delivery.user.presentation.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
