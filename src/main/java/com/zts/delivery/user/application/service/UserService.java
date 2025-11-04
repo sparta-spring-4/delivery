@@ -31,14 +31,14 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public UserProfile update(UUID userId, UserUpdate dto, LocalDateTime updatedAt) {
+    public UserProfile update(UserId userId, UserUpdate dto, LocalDateTime updatedAt) {
         UserProfile foundUser = getUserProfile(userId);
         if (dto.email() != null && !dto.email().equals(foundUser.email())) {
             checkDuplicatedEmail(dto.email());
         }
 
         User user = User.builder()
-                .userId(UserId.of(userId))
+                .userId(userId)
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .email(dto.email())
@@ -50,12 +50,12 @@ public class UserService {
         return UserProfile.of(updatedUSer);
     }
 
-    public void updatePassword(UUID userId, String password) {
-        userRepository.updatePassword(UserId.of(userId), password);
+    public void updatePassword(UserId userId, String password) {
+        userRepository.updatePassword(userId, password);
     }
 
-    public UserProfile getUserProfile(UUID userId) {
-        return userRepository.findById(UserId.of(userId))
+    public UserProfile getUserProfile(UserId userId) {
+        return userRepository.findById(userId)
                 .map(UserProfile::of)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
     }

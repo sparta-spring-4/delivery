@@ -1,13 +1,13 @@
 package com.zts.delivery.user.infrastructure.security;
 
 
+import com.zts.delivery.user.domain.UserId;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.UUID;
 
 public class JwtToUserAuthenticationConverter implements Converter<Jwt, UserAuthenticationToken> {
 
@@ -26,7 +26,7 @@ public class JwtToUserAuthenticationConverter implements Converter<Jwt, UserAuth
         String name = familyName + givenName;
 
         UserPrincipal principal = UserPrincipal.builder()
-                .userId(UUID.fromString(jwt.getSubject()))
+                .userId(UserId.of(jwt.getSubject()))
                 .username((String) claims.getOrDefault("preferred_username", ""))
                 .email((String) claims.getOrDefault("email", ""))
                 .name(name)

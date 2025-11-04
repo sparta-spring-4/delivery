@@ -22,4 +22,8 @@ public class UserId {
     public static UserId of(UUID id) {
         return new UserId(id);
     }
+
+    public static UserId of(String uuid) {
+        return new UserId(UUID.fromString(uuid));
+    }
 }
