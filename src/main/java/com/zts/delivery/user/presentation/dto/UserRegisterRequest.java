@@ -1,8 +1,8 @@
 package com.zts.delivery.user.presentation.dto;
 
-import com.zts.delivery.user.presentation.vaidation.Password;
-import com.zts.delivery.user.presentation.vaidation.PasswordMatch;
-import com.zts.delivery.user.presentation.vaidation.Phone;
+import com.zts.delivery.user.presentation.validation.Password;
+import com.zts.delivery.user.presentation.validation.PasswordMatch;
+import com.zts.delivery.user.presentation.validation.Phone;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
