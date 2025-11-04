@@ -15,7 +15,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class OrderId implements Serializable {
-    @Column(length = 45, name="order_id" )
     private UUID id;
 
     public OrderId(UUID id) {

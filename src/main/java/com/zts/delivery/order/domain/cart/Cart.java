@@ -1,22 +1,30 @@
 package com.zts.delivery.order.domain.cart;
 
 import com.zts.delivery.global.persistence.Price;
+import com.zts.delivery.global.persistence.common.DateAudit;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
-import com.zts.delivery.user.domain.UserId;
+import com.zts.delivery.menu.domain.Item;
+import com.zts.delivery.menu.domain.ItemId;
+import com.zts.delivery.user.UserId;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import java.time.LocalDateTime;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OrderColumn;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @ToString
@@ -25,57 +33,78 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Access(AccessType.FIELD)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class Cart {
+public class Cart extends DateAudit {
+
     @EmbeddedId
     private CartId id;
 
     @Embedded
     private UserId userId;
 
-    @Embedded
-    private CartItem item;
-
-    private int quantity;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "P_CART_ITEM", joinColumns = @JoinColumn(name = "cart_id"))
+    @OrderColumn(name = "item_idx")
+    private List<CartItem> cartItems;
 
     @Convert(converter = PriceConverter.class)
     private Price totalPrice;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
     @Builder
-    public Cart(CartId cartId, UserId userId, CartItem item, int quantity) {
+    public Cart(UserId userId) {
+        this.id = CartId.of();
         this.userId = userId;
-        this.quantity = quantity;
-        setCartItem(item);
-        calculateTotalPrice();
+        this.cartItems = new ArrayList<>();
+        this.totalPrice = new Price(0);
     }
 
-    public static Cart create(UserId userId, CartItem item, int quantity) {
+    public void addItem(Item item, List<Integer> optionList) {
 
-        Cart cart = Cart.builder()
-            .userId(userId)
-            .item(item)
-            .quantity(quantity)
+        CartItem existingItem = findMatchingItem(item.getId(), optionList);
+
+        if (existingItem != null) {
+            int itemIndex = this.cartItems.indexOf(existingItem);
+            int newQuantity = existingItem.getQuantity() + 1;
+            return;
+        }
+        Price newPrice = item.calculateItemPrice(optionList);
+
+        CartItem newItem = CartItem.builder()
+            .id(item.getId())
+            .itemName(item.getName())
+            .quantity(1)
+            .selectedOptions(optionList)
+            .price(newPrice)
             .build();
 
-        cart.id = CartId.of();
-
-        return cart;
+        this.cartItems.add(newItem);
+        recalculateTotalPrice();
     }
 
-
-    // 장바구니 상품이 없다면 담을 수 없음
-    private void setCartItem(CartItem item) {
-        // if (item == null) throw new CartItemNotFoundException();
-
-        this.item = item;
+    public void removeItem(int itemIndex) {
+        findCartItemByIndex(itemIndex); // 인덱스 검증
+        this.cartItems.remove(itemIndex);
+        recalculateTotalPrice(); // 총액 재계산
     }
 
-    // 장바구니 상품별 총 합계
-    private void calculateTotalPrice() {
-        if (item == null) return;
+    private void recalculateTotalPrice() {
+        Price newTotal = new Price(0); // Price.ZERO
+        for (CartItem item : this.cartItems) {
+            newTotal = newTotal.add(item.calculateItemPrice());
+        }
+        this.totalPrice = newTotal;
+    }
 
-        totalPrice = new Price(item.getItemPrice().getValue() * quantity);
+    private CartItem findCartItemByIndex(int itemIndex) {
+        if (itemIndex < 0 || itemIndex >= this.cartItems.size()) {
+            throw new IndexOutOfBoundsException("Invalid item index for cart: " + itemIndex);
+        }
+        return this.cartItems.get(itemIndex);
+    }
+
+    private CartItem findMatchingItem(ItemId itemId, List<Integer> optionList) {
+        return this.cartItems.stream()
+            .filter(ci -> ci.matches(itemId, optionList))
+            .findFirst()
+            .orElse(null);
     }
 }

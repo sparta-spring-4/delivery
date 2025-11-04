@@ -14,13 +14,14 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,9 +39,7 @@ public class Item extends BaseEntity {
     private ItemId id;
 
     @Embedded
-    @AttributeOverrides(
-        @AttributeOverride(name = "id", column = @Column(name = "store_id", nullable = false))
-    )
+    @AttributeOverride(name = "store_id", column = @Column(name = "store_id", nullable = false))
     private StoreId storeId;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -54,6 +53,7 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ItemStatus status;
 
@@ -73,13 +73,9 @@ public class Item extends BaseEntity {
         this.price = price;
         this.name = name;
         this.itemOptions = itemOptions;
-        this.status = Objects.requireNonNullElse(status, ItemStatus.UNLIMITED_STOCK); // 재고 기본 값은 무제한 재고
+        this.status = Objects.requireNonNullElse(status, ItemStatus.UNLIMITED_STOCK);
+        this.active = true;
         setStock(stock);
-
-    }
-
-    public int getPriceValue() {
-        return price.getValue();
     }
 
     public void setStock(Stock stock) {
@@ -103,31 +99,20 @@ public class Item extends BaseEntity {
         itemOptions.remove(itemOption);
     }
 
-    // 옵션 순서 번호로 제거
-    public void removeOption(int idx) {
-        if (itemOptions == null) return;
+    public Price calculateItemPrice(List<Integer> optionList) {
 
-        itemOptions.remove(idx);
-    }
-    // 전체 옵션 제거
-    public void removeOptionAll() {
-        if (itemOptions == null) return;
+        Price totalPrice = this.price;
 
-        itemOptions.clear();
-    }
-    /**
-     * 상품 수량 + 옵션 번호, 수량으로 금액 계산
-     */
+        if (itemOptions != null && !itemOptions.isEmpty() &&
+            optionList != null && !optionList.isEmpty()) {
 
-    public Price getTotal(int itemCnt, Map<Integer, Integer> options) {
-        Price totalPrice = price.multiply(itemCnt);
+            for (Integer optionIdx : optionList) {
 
-        if (itemOptions != null && options != null) {
-            options.forEach((optionIdx, optionCnt) -> {
-                ItemOption item = itemOptions.get(optionIdx);
-                if (item == null) return;
-                totalPrice.add(item.getPrice().multiply(optionCnt));
-            });
+                if (optionIdx >= 0 && optionIdx < itemOptions.size()) {
+                    ItemOption selectedOption = itemOptions.get(optionIdx);
+                    totalPrice = totalPrice.add(selectedOption.getPrice());
+                }
+            }
         }
 
         return totalPrice;
