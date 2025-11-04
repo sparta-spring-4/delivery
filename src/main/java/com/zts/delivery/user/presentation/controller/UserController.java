@@ -79,24 +79,24 @@ public class UserController {
 
     @DeleteMapping
     public void withdraw(@AuthenticationPrincipal UserPrincipal principal) {
-        userService.withdraw(UserId.of(principal.userId()));
+        userService.withdraw(principal.userId());
     }
 
     @PostMapping("/address")
     public UserResponse addUserAddress(@AuthenticationPrincipal UserPrincipal principal, @RequestBody RegisterUserAddressRequest address) {
-        UserProfile userProfile = userService.addUserAddresses(UserId.of(principal.userId()), address.toServiceDto());
+        UserProfile userProfile = userService.addUserAddresses(principal.userId(), address.toServiceDto());
         return UserResponse.of(userProfile);
     }
 
     @DeleteMapping("/address/{addressId}")
     public void deleteUserAddress(@AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID addressId) {
-        userService.deleteUserAddress(UserId.of(principal.userId()), addressId);
+        userService.deleteUserAddress(principal.userId(), addressId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/profile/{userId}")
     public UserResponse userProfile(@PathVariable("userId") String userId) {
-        UserProfile userProfile = userService.getUserProfile(UUID.fromString(userId));
+        UserProfile userProfile = userService.getUserProfile(UserId.of(userId));
         return UserResponse.of(userProfile);
     }
 }
