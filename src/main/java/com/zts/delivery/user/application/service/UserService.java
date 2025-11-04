@@ -6,10 +6,10 @@ import com.zts.delivery.user.application.dto.RegisterUserAddress;
 import com.zts.delivery.user.application.dto.UserProfile;
 import com.zts.delivery.user.application.dto.UserRegister;
 import com.zts.delivery.user.application.dto.UserUpdate;
-import com.zts.delivery.user.domain.UserAddress;
-import com.zts.delivery.user.domain.UserRole;
 import com.zts.delivery.user.domain.User;
+import com.zts.delivery.user.domain.UserAddress;
 import com.zts.delivery.user.domain.UserId;
+import com.zts.delivery.user.domain.UserRole;
 import com.zts.delivery.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -60,11 +60,9 @@ public class UserService {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public UserProfile addUserAddresses(UserId userId, List<RegisterUserAddress> registerUserAddresses) {
-        List<UserAddress> userAddresses = registerUserAddresses.stream()
-                .map(it -> it.toUserAddress(UUID.randomUUID()))
-                .toList();
-        User user = userRepository.addAddresses(userId, userAddresses);
+    public UserProfile addUserAddresses(UserId userId, RegisterUserAddress registerUserAddress) {
+        UserAddress userAddress = registerUserAddress.toUserAddress(UUID.randomUUID());
+        User user = userRepository.addAddress(userId, userAddress);
         return UserProfile.of(user);
     }
 
@@ -82,5 +80,9 @@ public class UserService {
 
     public void withdraw(UserId userId) {
         userRepository.deleteById(userId);
+    }
+
+    public void deleteUserAddress(UserId userId, UUID targetAddressId) {
+        userRepository.deleteAddress(userId, targetAddressId);
     }
 }
