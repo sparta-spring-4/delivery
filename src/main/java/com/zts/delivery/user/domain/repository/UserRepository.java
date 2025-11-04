@@ -4,8 +4,8 @@ import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserAddress;
 import com.zts.delivery.user.domain.UserId;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepository {
 
@@ -21,5 +21,7 @@ public interface UserRepository {
 
     void deleteById(UserId userId);
 
-    User addAddresses(UserId userId, List<UserAddress> userAddresses);
+    User addAddress(UserId userId, UserAddress userAddress);
+
+    void deleteAddress(UserId userId, UUID addressId);
 }

@@ -17,7 +17,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @EnableConfigurationProperties(KeycloakProperties.class)
@@ -120,12 +119,12 @@ public class KeycloakUserRepository implements UserRepository {
     }
 
     @Override
-    public User addAddresses(UserId userId, List<UserAddress> userAddresses) {
+    public User addAddress(UserId userId, UserAddress userAddress) {
         UserRepresentation representation = getUserRepresentation(userId);
         Map<String, List<String>> attributes = Objects.requireNonNullElseGet(representation.getAttributes(), HashMap::new);
 
         List<String> existingAddressJsons = attributes.getOrDefault("addresses", new ArrayList<>());
-        List<String> newAddressJsons = userAddressListConverter.convertToDatabaseColumn(userAddresses);
+        List<String> newAddressJsons = userAddressListConverter.convertToKeycloakAttribute(List.of(userAddress));
         existingAddressJsons.addAll(newAddressJsons);
         attributes.put("addresses", existingAddressJsons);
         representation.setAttributes(attributes);
@@ -133,6 +132,24 @@ public class KeycloakUserRepository implements UserRepository {
 
         return findById(userId)
                 .orElseThrow(() -> new IllegalStateException("주소 정보 저장 후 유저 데이터를 찾을 수 없습니다. (내부 오류)"));
+    }
+
+    @Override
+    public void deleteAddress(UserId userId, UUID targetAddressId) {
+        UserRepresentation representation = getUserRepresentation(userId);
+        Map<String, List<String>> attributes = Objects.requireNonNullElseGet(representation.getAttributes(), HashMap::new);
+        List<String> existingAddressJsons = attributes.get("addresses");
+        if (existingAddressJsons == null || existingAddressJsons.isEmpty()) {
+            return;
+        }
+        List<UserAddress> existingAddresses = userAddressListConverter.convertToEntityAttribute(existingAddressJsons);
+        List<UserAddress> addressesWithoutTarget = existingAddresses.stream()
+                .filter(address -> !address.id().equals(targetAddressId))
+                .toList();
+        List<String> addressJsonsWithoutTarget = userAddressListConverter.convertToKeycloakAttribute(addressesWithoutTarget);
+        attributes.put("addresses", addressJsonsWithoutTarget);
+        representation.setAttributes(attributes);
+        keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).update(representation);
     }
 
     private User saveUser(User user) {

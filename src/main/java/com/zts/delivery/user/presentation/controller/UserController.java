@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -85,8 +84,13 @@ public class UserController {
 
     @PostMapping("/address")
     public UserResponse addUserAddress(@AuthenticationPrincipal UserPrincipal principal, @RequestBody RegisterUserAddressRequest address) {
-        UserProfile userProfile = userService.addUserAddresses(UserId.of(principal.userId()), List.of(address.toServiceDto()));
+        UserProfile userProfile = userService.addUserAddresses(UserId.of(principal.userId()), address.toServiceDto());
         return UserResponse.of(userProfile);
+    }
+
+    @DeleteMapping("/address/{addressId}")
+    public void deleteUserAddress(@AuthenticationPrincipal UserPrincipal principal, @PathVariable UUID addressId) {
+        userService.deleteUserAddress(UserId.of(principal.userId()), addressId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
