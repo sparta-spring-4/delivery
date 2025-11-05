@@ -1,5 +1,7 @@
 package com.zts.delivery.order.domain.cart;
 
+import com.zts.delivery.order.domain.OrderId;
+import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
