@@ -70,7 +70,8 @@ public class Cart extends DateAudit {
     }
 
     // removeItem 메서드는 더 이상 항목을 제거하기 전에 itemIndex를 검증하지 않습니다. 제거된 검증 로직 'findCartItemByIndex(itemIndex)'는 유지하거나 범위를 확인하는 로직으로 대체하여 IndexOutOfBoundsException을 방지해야 합니다.
-    public void removeItem(int itemIndex) {
+    public void removeItem(Item item , int itemIndex) {
+        // isValidOptionIndices(item ,);
         this.cartItems.remove(itemIndex);
         calculateTotalPrice(); // 총액 재계산
     }
@@ -84,12 +85,9 @@ public class Cart extends DateAudit {
     }
 
 
-    // 제거된 findCartItemByIndex
     public void changeItemQuantity(int idx, boolean isAdding) {
         CartItem item = this.cartItems.get(idx);
-        if(item.getQuantity() == 1 && isAdding) {
-            item.updateQuantity(isAdding);
-        }
+        item.updateQuantity(isAdding);
         this.cartItems.set(idx, item);
         calculateTotalPrice();
     }

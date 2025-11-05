@@ -57,6 +57,11 @@ public class CartService {
             throw new ApplicationException(ErrorCode.FORBIDDEN);
         }
 
+        CartItem cartItem = t_cart.getCartItems().get(idx);
+        if (cartItem.getQuantity() == 1 && !adding) {
+            delete(userId);
+        }
+
         t_cart.changeItemQuantity(idx, adding);
 
         Cart p_cart = cartRepository.save(t_cart);
@@ -98,7 +103,7 @@ public class CartService {
             throw new IllegalArgumentException("Not a sellable item.");
         }
 
-        int maxIndex = item.getItemOptions().size() - 1;
+        int maxIndex = (item.getItemOptions() != null) ? item.getItemOptions().size() - 1 : -1;
         if (optionList != null) {
             for (Integer idx : optionList) {
                 if (idx < 0 || idx > maxIndex) {

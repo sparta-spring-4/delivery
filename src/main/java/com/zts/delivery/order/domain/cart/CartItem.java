@@ -69,14 +69,13 @@ public class CartItem {
     }
 
     public CartItem chooseOptions(Item item, List<Integer> newIndices) {
-        CartItem updatedItem = CartItem.builder()
+
+        return CartItem.builder()
             .id(this.id)
             .quantity(this.quantity)
             .selectedOptions(newIndices)
-            .price(price.add(item.getOptionsPrice(newIndices)))
+            .price(price.add(item.getOptionsPrice(newIndices)).multiply(quantity))
             .build();
-        updatedItem.calculateItemPrice();
-        return updatedItem;
     }
 
     public Price calculateItemPrice() {
