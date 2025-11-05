@@ -3,7 +3,6 @@ package com.zts.delivery.order.domain.cart;
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.converter.IntegerListConverter;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
-import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.menu.domain.Item;
 import com.zts.delivery.menu.domain.ItemId;
 import jakarta.persistence.AttributeOverride;
@@ -50,9 +49,6 @@ public class CartItem {
     }
 
     public CartItem updateQuantity(boolean isAdding) {
-        if (quantity == 1 && !isAdding) {
-
-        }
         if (isAdding) {
             quantity ++;
         }
