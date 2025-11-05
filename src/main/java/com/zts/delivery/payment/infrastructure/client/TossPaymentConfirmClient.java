@@ -1,8 +1,11 @@
 package com.zts.delivery.payment.infrastructure.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.payment.infrastructure.config.TossPaymentKeyProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -18,18 +21,24 @@ public class TossPaymentConfirmClient {
 
     private final TossPaymentKeyProperties properties;
 
-    public TossPaymentConfirmClientResponse confirm(TossPaymentConfirmClientRequest request) {
+    private final ObjectMapper objectMapper;
+
+    public TossPaymentConfirmClientResponse confirm(TossPaymentConfirmClientRequest confirmRequest) {
         String authorizations = "Basic " + encodingToBase64(properties.secretKey());
 
-        ResponseEntity<TossPaymentConfirmClientResponse> response = RestClient.create().post()
+        ResponseEntity<TossPaymentConfirmClientResponse> confirmResponse = RestClient.create().post()
                 .uri(properties.confirm().uri())
                 .header("Authorization", authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(request)
+                .body(confirmRequest)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, (request, response) -> {
+                    TossClientErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossClientErrorResponse.class);
+                    throw new ApplicationException(response.getStatusCode(), errorResponse.code(), errorResponse.message());
+                })
                 .toEntity(TossPaymentConfirmClientResponse.class);
 
-        return response.getBody();
+        return confirmResponse.getBody();
     }
 
     private String encodingToBase64(String secretKey) {

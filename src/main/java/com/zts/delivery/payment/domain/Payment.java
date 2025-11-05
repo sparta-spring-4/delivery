@@ -28,7 +28,7 @@ public class Payment extends DateAudit {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "totalPrice"))
+            @AttributeOverride(name = "value", column = @Column(name = "total_price"))
     })
     private Price totalPrice;
 
