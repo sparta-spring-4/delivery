@@ -32,6 +32,7 @@ public class PaymentLogEventListener {
                 .orderId(event.orderId())
                 .paymentKey(event.paymentKey())
                 .totalPrice(event.totalPrice())
+                .paymentType(event.paymentType())
                 .errorType(PaymentErrorType.CONFIRM)
                 .httpStatus(event.httpStatus())
                 .errorCode(event.errorCode())

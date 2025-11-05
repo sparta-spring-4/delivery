@@ -19,8 +19,13 @@ public class PaymentLog extends DateAudit {
     @EmbeddedId
     private PaymentLogId id;
 
+
     @Embedded
     private OrderId orderId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 45)
+    private PaymentType paymentType;
 
     private String paymentKey;
 
@@ -44,11 +49,13 @@ public class PaymentLog extends DateAudit {
     @Column(length = 255)
     private String errorMessage;
 
+
     @Builder
-    public PaymentLog(OrderId orderId, String paymentKey, Price totalPrice, PaymentErrorType errorType, HttpStatus httpStatus, String errorCode, String errorMessage) {
+    public PaymentLog(OrderId orderId, PaymentType paymentType, String paymentKey, Price totalPrice, PaymentErrorType errorType, HttpStatus httpStatus, String errorCode, String errorMessage) {
         this.id = PaymentLogId.of();
         this.orderId = orderId;
         this.paymentKey = paymentKey;
+        this.paymentType = paymentType;
         this.totalPrice = totalPrice;
         this.errorType = errorType;
         this.httpStatus = httpStatus;
