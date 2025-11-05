@@ -3,6 +3,8 @@ package com.zts.delivery.order.domain.cart;
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.converter.IntegerListConverter;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
+import com.zts.delivery.infrastructure.execption.ApplicationException;
+import com.zts.delivery.menu.domain.Item;
 import com.zts.delivery.menu.domain.ItemId;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -10,7 +12,6 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,9 +31,6 @@ public class CartItem {
     @AttributeOverride(name = "id", column = @Column(name = "item_id", nullable = false))
     private ItemId id;
 
-    @Column(length = 60)
-    private String itemName;
-
     @Column(nullable = false)
     private int quantity;
 
@@ -44,46 +42,41 @@ public class CartItem {
     private Price price;
 
     @Builder
-    public CartItem(ItemId id, String itemName, int quantity, List<Integer> selectedOptions, Price price) {
+    public CartItem(ItemId id, int quantity, List<Integer> selectedOptions, Price price) {
         this.id = id;
-        this.itemName = itemName;
         this.quantity = quantity;
         this.selectedOptions = (selectedOptions != null) ? new ArrayList<>(selectedOptions) : new ArrayList<>();
         this.price = price;
     }
 
-    public CartItem updateQuantity(int newQuantity) {
-        return new CartItem(
-            this.id,
-            this.itemName,
-            newQuantity,
-            this.selectedOptions,
-            this.price
-        );
-    }
+    public CartItem updateQuantity(boolean isAdding) {
+        if (quantity == 1 && !isAdding) {
 
-    public CartItem updateOptions(List<Integer> newIndices) {
-        return new CartItem(
-            this.id,
-            this.itemName,
-            this.quantity,
-            newIndices,
-            this.price
-        );
-    }
-
-    public boolean matches(ItemId itemId, List<Integer> options) {
-        // 1. ID가 다르면 무조건 false
-        if (!this.id.equals(itemId)) {
-            return false;
+        }
+        if (isAdding) {
+            quantity ++;
+        }
+        else {
+            quantity --;
         }
 
-        // 2. 비교 대상 옵션 목록도 정렬하여 동일한 기준으로 비교
-        List<Integer> safeOptions = (options != null) ? new ArrayList<>(options) : new ArrayList<>();
-        Collections.sort(safeOptions);
+        return CartItem.builder()
+            .id(this.id)
+            .quantity(this.quantity)
+            .selectedOptions(this.selectedOptions)
+            .price(calculateItemPrice())
+            .build();
+    }
 
-        // 3. 정렬된 옵션 목록 비교
-        return this.selectedOptions.equals(safeOptions);
+    public CartItem chooseOptions(Item item, List<Integer> newIndices) {
+        CartItem updatedItem = CartItem.builder()
+            .id(this.id)
+            .quantity(this.quantity)
+            .selectedOptions(newIndices)
+            .price(price.add(item.getOptionsPrice(newIndices)))
+            .build();
+        updatedItem.calculateItemPrice();
+        return updatedItem;
     }
 
     public Price calculateItemPrice() {

@@ -1,5 +1,7 @@
 package com.zts.delivery.order.domain.cart;
 
+import com.zts.delivery.order.domain.OrderId;
+import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
@@ -16,7 +18,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class CartId implements Serializable {
-    @Column(columnDefinition = "BINARY(16)" ,length = 45, name = "cart_id" )
+    @Column(length = 45, name = "cart_id" )
     private UUID id;
 
     public CartId(UUID id) {

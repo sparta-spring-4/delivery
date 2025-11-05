@@ -78,18 +78,18 @@ public class Item extends BaseEntity {
         setStock(stock);
     }
 
-    public void setStock(Stock stock) {
-        this.stock = stock;
-
-        if (stock.getValue() == 0 || status == ItemStatus.OUT_OF_STOCK) {
-            outOfStock = true;
-        }
-    }
-
     // 옵션 추가
     public void addOption(ItemOption itemOption) {
-        this.itemOptions = Objects.requireNonNullElseGet(this.itemOptions, ArrayList::new);
-        this.itemOptions.add(itemOption);
+        itemOptions = Objects.requireNonNullElseGet(itemOptions, ArrayList::new);
+        itemOptions.add(itemOption);
+    }
+
+    // 옵션 변경
+
+    public void updateOption(int index, ItemOption itemOption) {
+        if (itemOptions == null) return;
+
+        itemOptions.set(index, itemOption);
     }
 
     // 옵션 제거
@@ -99,22 +99,26 @@ public class Item extends BaseEntity {
         itemOptions.remove(itemOption);
     }
 
-    public Price calculateItemPrice(List<Integer> optionList) {
 
-        Price totalPrice = this.price;
+    public void setStock(Stock stock) {
+        this.stock = stock;
 
-        if (itemOptions != null && !itemOptions.isEmpty() &&
-            optionList != null && !optionList.isEmpty()) {
+        if (stock.getValue() == 0 || status == ItemStatus.OUT_OF_STOCK) {
+            outOfStock = true;
+        }
+    }
 
-            for (Integer optionIdx : optionList) {
-
-                if (optionIdx >= 0 && optionIdx < itemOptions.size()) {
-                    ItemOption selectedOption = itemOptions.get(optionIdx);
-                    totalPrice = totalPrice.add(selectedOption.getPrice());
-                }
-            }
+    public Price getOptionsPrice(List<Integer> optionIndices) {
+        if (optionIndices == null || optionIndices.isEmpty()) {
+            return new Price(0);
         }
 
-        return totalPrice;
+        Price totalOptionsPrice = new Price(0);
+        for (Integer idx : optionIndices) {
+            ItemOption option = itemOptions.get(idx);
+            totalOptionsPrice = totalOptionsPrice.add(option.getPrice());
+        }
+
+        return totalOptionsPrice;
     }
 }

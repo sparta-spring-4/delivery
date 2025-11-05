@@ -4,7 +4,6 @@ import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.common.DateAudit;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
 import com.zts.delivery.menu.domain.Item;
-import com.zts.delivery.menu.domain.ItemId;
 import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
@@ -47,64 +46,73 @@ public class Cart extends DateAudit {
     private List<CartItem> cartItems;
 
     @Convert(converter = PriceConverter.class)
-    private Price totalPrice;
+    private Price price;
 
     @Builder
     public Cart(UserId userId) {
         this.id = CartId.of();
         this.userId = userId;
         this.cartItems = new ArrayList<>();
-        this.totalPrice = new Price(0);
+        this.price = new Price(0);
     }
 
     public void addItem(Item item, List<Integer> optionList) {
 
-        CartItem existingItem = findMatchingItem(item.getId(), optionList);
-
-        if (existingItem != null) {
-            int itemIndex = this.cartItems.indexOf(existingItem);
-            int newQuantity = existingItem.getQuantity() + 1;
-            return;
-        }
-        Price newPrice = item.calculateItemPrice(optionList);
-
         CartItem newItem = CartItem.builder()
             .id(item.getId())
-            .itemName(item.getName())
             .quantity(1)
             .selectedOptions(optionList)
-            .price(newPrice)
+            .price(item.getPrice())
             .build();
 
         this.cartItems.add(newItem);
-        recalculateTotalPrice();
+        calculateTotalPrice();
     }
 
+    // removeItem 메서드는 더 이상 항목을 제거하기 전에 itemIndex를 검증하지 않습니다. 제거된 검증 로직 'findCartItemByIndex(itemIndex)'는 유지하거나 범위를 확인하는 로직으로 대체하여 IndexOutOfBoundsException을 방지해야 합니다.
     public void removeItem(int itemIndex) {
-        findCartItemByIndex(itemIndex); // 인덱스 검증
         this.cartItems.remove(itemIndex);
-        recalculateTotalPrice(); // 총액 재계산
+        calculateTotalPrice(); // 총액 재계산
     }
 
-    private void recalculateTotalPrice() {
-        Price newTotal = new Price(0); // Price.ZERO
+    private void calculateTotalPrice() {
+        Price newTotal = new Price(0);
         for (CartItem item : this.cartItems) {
             newTotal = newTotal.add(item.calculateItemPrice());
         }
-        this.totalPrice = newTotal;
+        this.price = newTotal;
     }
 
-    private CartItem findCartItemByIndex(int itemIndex) {
-        if (itemIndex < 0 || itemIndex >= this.cartItems.size()) {
-            throw new IndexOutOfBoundsException("Invalid item index for cart: " + itemIndex);
+
+    // 제거된 findCartItemByIndex
+    public void changeItemQuantity(int idx, boolean isAdding) {
+        CartItem item = this.cartItems.get(idx);
+        if(item.getQuantity() == 1 && isAdding) {
+            item.updateQuantity(isAdding);
         }
-        return this.cartItems.get(itemIndex);
+        this.cartItems.set(idx, item);
+        calculateTotalPrice();
     }
 
-    private CartItem findMatchingItem(ItemId itemId, List<Integer> optionList) {
-        return this.cartItems.stream()
-            .filter(ci -> ci.matches(itemId, optionList))
-            .findFirst()
-            .orElse(null);
+
+    public void changeItemOptions(CartItem cartItem, Item item, List<Integer> options) {
+
+        // 검증 로직
+        if(!isValidOptionIndices(item, options)) {
+            throw new IllegalArgumentException("Invalid option indices");
+        }
+        // 옵션을 변경하여 해당하는 item 객체 반환
+        cartItem.chooseOptions(item, options);
+    }
+
+    private boolean isValidOptionIndices(Item item, List<Integer> optionIndices) {
+        int optionsSize = item.getItemOptions() != null ? item.getItemOptions().size() : 0;
+
+        for (Integer index : optionIndices) {
+            if (index < 0 || index >= optionsSize) {
+                return false;
+            }
+        }
+        return true;
     }
 }

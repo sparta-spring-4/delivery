@@ -78,7 +78,7 @@ public class Order extends BaseEntity {
             .status(OrderStatus.ORDER_ACCEPT)
             .build();
 
-        order.id = OrderId.of(UUID.randomUUID());
+        order.id = OrderId.of();
 
         return order;
     }
