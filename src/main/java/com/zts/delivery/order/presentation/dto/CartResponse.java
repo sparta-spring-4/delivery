@@ -2,23 +2,28 @@ package com.zts.delivery.order.presentation.dto;
 
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.order.domain.cart.Cart;
+import java.util.List;
+import java.util.UUID;
 import lombok.Builder;
-import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
 
 @Builder
 public record CartResponse(
-    Price totalCartPrice,
-    int totalItemLines
-    // int totalItemQuantity
-    // List<CartItemResponse> items
+    UUID cartId,
+    UUID userId,
+    List<UUID> cartItemIds,
+    Price price
 ) {
 
-    public static CartResponse from(Cart cart) {
+    public static CartResponse of(Cart cart) {
+        List<UUID> cartItemIds = cart.getCartItems().stream()
+            .map(cartItem -> cartItem.getId().getId())
+            .toList();
+
         return CartResponse.builder()
-            .totalCartPrice(cart.getTotalPrice())
-            // .items(cart.getCartItems().stream()
-            //     .map(CartItemResponse::from)
-            //     .toList())
+            .cartId(cart.getId().getId())
+            .userId(cart.getUserId().getId())
+            .cartItemIds(cartItemIds)
+            .price(cart.getPrice())
             .build();
     }
 }

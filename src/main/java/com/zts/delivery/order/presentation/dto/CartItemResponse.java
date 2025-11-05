@@ -18,7 +18,6 @@ public record CartItemResponse(
      */
     public static CartItemResponse from(CartItem cartItem) {
         return CartItemResponse.builder()
-            .itemName(cartItem.getItemName())
             .quantity(cartItem.getQuantity())
             .linePrice(cartItem.getPrice())
             .selectedOptionIndices(cartItem.getSelectedOptions())

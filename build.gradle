@@ -55,6 +55,10 @@ dependencies {
     implementation 'org.keycloak:keycloak-admin-client:26.0.7'
 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13'
+
+    implementation 'ch.qos.logback:logback-classic:1.5.13'
+    implementation 'ch.qos.logback:logback-core:1.5.19'
+    implementation 'org.slf4j:slf4j-api:2.1.0-alpha1'
 }
 
 tasks.named('test') {
