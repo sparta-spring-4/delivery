@@ -34,7 +34,7 @@ public class TossPaymentConfirmClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (request, response) -> {
                     TossClientErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossClientErrorResponse.class);
-                    throw new ApplicationException(response.getStatusCode(), errorResponse.code(), errorResponse.message());
+                    throw new TossClientErrorException(response.getStatusCode(), errorResponse.code(), errorResponse.message());
                 })
                 .toEntity(TossPaymentConfirmClientResponse.class);
 

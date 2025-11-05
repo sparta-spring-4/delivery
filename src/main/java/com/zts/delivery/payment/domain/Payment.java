@@ -32,7 +32,7 @@ public class Payment extends DateAudit {
     })
     private Price totalPrice;
 
-    private String pgTransactionKey;
+    private String paymentKey;
 
     @Column(length = 45)
     @Enumerated(EnumType.STRING)
@@ -47,15 +47,25 @@ public class Payment extends DateAudit {
     private LocalDateTime approvedAt;
 
     @Builder
-    public Payment(OrderId orderId, UserId userId, Price totalPrice, String pgTransactionKey, PaymentStatus status, PaymentType type, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+    public Payment(OrderId orderId, UserId userId, Price totalPrice, String paymentKey, PaymentStatus status, PaymentType type, LocalDateTime requestedAt, LocalDateTime approvedAt) {
         this.id = PaymentId.of();
         this.orderId = orderId;
         this.userId = userId;
         this.totalPrice = totalPrice;
-        this.pgTransactionKey = pgTransactionKey;
+        this.paymentKey = paymentKey;
         this.status = status;
         this.type = type;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
+
+        // 주문 금액 검증
+//        validateOrder(orderId, totalPrice, validator);
     }
+
+    // 결제 전 주문금액 검증
+    /*private void validateOrder(OrderId orderId, Price totalPrice, PayOrderValidator validator) {
+        if (!validator.validate(orderId, totalPrice)) {
+            throw new PaymentPriceWrongException();
+        }
+    }*/
 }
