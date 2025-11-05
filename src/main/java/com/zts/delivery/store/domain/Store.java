@@ -1,7 +1,7 @@
 package com.zts.delivery.store.domain;
 
 import com.zts.delivery.global.persistence.common.BaseEntity;
-import com.zts.delivery.user.UserId;
+import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.*;
 import lombok.*;
 

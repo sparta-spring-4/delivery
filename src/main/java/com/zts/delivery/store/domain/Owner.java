@@ -1,7 +1,6 @@
 package com.zts.delivery.store.domain;
 
 import com.zts.delivery.user.domain.UserId;
-import com.zts.delivery.user.UserId;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
