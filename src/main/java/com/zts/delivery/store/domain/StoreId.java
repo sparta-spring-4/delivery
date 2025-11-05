@@ -17,6 +17,9 @@ public class StoreId {
 
     public StoreId(UUID id) { this.id = id; }
 
+    public static StoreId of() {
+        return StoreId.of(UUID.randomUUID());
+    }
+
     public static StoreId of(UUID id) { return new StoreId(id); }
 }
-
