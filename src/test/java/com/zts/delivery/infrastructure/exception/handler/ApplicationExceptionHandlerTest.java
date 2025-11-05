@@ -27,7 +27,7 @@ public class ApplicationExceptionHandlerTest {
     void applicationException() throws Exception {
         mockMvc.perform(get("/test/app-exception"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.code").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("Bad Request"))
                 .andExpect(jsonPath("$.details").isEmpty());
     }
@@ -48,7 +48,7 @@ public class ApplicationExceptionHandlerTest {
                         .content(request)
                         .with(csrf()))
                 .andExpect(status().isPreconditionFailed())
-                .andExpect(jsonPath("$.code").value(1000))
+                .andExpect(jsonPath("$.code").value("REQUEST_VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.message").value("Request value is not valid"))
                 .andExpect(jsonPath("$.details[*].field", containsInAnyOrder("name", "age", "isAdult")))
                 .andExpect(jsonPath("$.details[*].reason",
@@ -62,7 +62,7 @@ public class ApplicationExceptionHandlerTest {
     void uncaughtException() throws Exception {
         mockMvc.perform(get("/test/uncaught-exception"))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.code").value(500))
+                .andExpect(jsonPath("$.code").value("INTERNAL_SERVER_ERROR"))
                 .andExpect(jsonPath("$.message").value("Internal Server Error"))
                 .andExpect(jsonPath("$.details").isEmpty());
     }

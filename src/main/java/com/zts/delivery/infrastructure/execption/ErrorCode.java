@@ -8,17 +8,22 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-    OK(HttpStatus.OK, 200, "OK"),
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, 400, "Bad Request"),
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 401, "Unauthorized"),
-    FORBIDDEN(HttpStatus.FORBIDDEN, 403, "Forbidden"),
-    NOT_FOUND(HttpStatus.NOT_FOUND, 404, "Not Found"),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Internal Server Error"),
+    OK(HttpStatus.OK, "OK", "OK"),
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "BAD_REQUEST", "Bad Request"),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Unauthorized"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "FORBIDDEN", "Forbidden"),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "NOT_FOUND", "Not Found"),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "Internal Server Error"),
 
     // validation
-    REQUEST_VALIDATION_ERROR(HttpStatus.PRECONDITION_FAILED, 1000, "Request value is not valid");
+    REQUEST_VALIDATION_ERROR(HttpStatus.PRECONDITION_FAILED, "REQUEST_VALIDATION_ERROR", "Request value is not valid"),
+
+    // user
+    DUPLICATED_USERNAME(HttpStatus.CONFLICT, "DUPLICATED_USERNAME", "Username is already taken."),
+    DUPLICATED_EMAIL(HttpStatus.CONFLICT, "DUPLICATED_EMAIL", "Email is already in use."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND,"USER_NOT_FOUND", "User Not Found");
 
     private final HttpStatus httpStatus;
-    private final int code;
-    private final String message;
+    private final String code;
+    private final String defaultMessage;
 }

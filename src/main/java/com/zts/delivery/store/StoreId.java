@@ -1,8 +1,7 @@
-package com.zts.delivery.menu.domain;
+package com.zts.delivery.store;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import java.io.Serializable;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -15,19 +14,19 @@ import lombok.ToString;
 @Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ItemId implements Serializable {
-    @Column(name="item_id")
+public class StoreId {
+    @Column(length=45, name="store_id")
     private UUID id;
 
-    public ItemId(UUID id) {
+    public StoreId(UUID id) {
         this.id = id;
     }
 
-    public static ItemId of() {
-        return ItemId.of(UUID.randomUUID());
+    public static StoreId of() {
+        return StoreId.of(java.util.UUID.randomUUID());
     }
 
-    public static ItemId of(UUID id) {
-        return new ItemId(id);
+    public static StoreId of(UUID id) {
+        return new StoreId(id);
     }
 }
