@@ -53,7 +53,6 @@ public class TossConfirmService {
      */
     @Scheduled(fixedDelay = 1L, timeUnit = TimeUnit.SECONDS)
     public void retryConfirmPayment() {
-//        paymentLogRepository.
     }
 
     private TossPaymentConfirmClientResponse requestConfirmation(ConfirmTossPayment confirmTossPayment) {
