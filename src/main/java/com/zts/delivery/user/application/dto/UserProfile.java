@@ -1,6 +1,7 @@
 package com.zts.delivery.user.application.dto;
 
 import com.zts.delivery.user.domain.User;
+import com.zts.delivery.user.domain.UserRole;
 import com.zts.delivery.user.domain.UserStatus;
 import lombok.Builder;
 
@@ -17,6 +18,7 @@ public record UserProfile(
         String lastName,
         String phone,
         List<UserAddressInfo> addresses,
+        List<UserRole> userRoles,
         UserStatus status,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -32,6 +34,7 @@ public record UserProfile(
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .userRoles(user.getRoles())
                 .phone(user.getPhone())
                 .status(user.getStatus())
                 .addresses(userAddressInfos)

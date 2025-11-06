@@ -41,8 +41,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ROLE_MASTER > ROLE_MANAGER > ROLE_OWNER > ROLE_CUSTOMER
-    // 앞쪽에 있는 ROLE이 상위 ROLE 이다.
+    /**
+     * ROLE_MASTER > ROLE_MANAGER > ROLE_OWNER > ROLE_CUSTOMER
+     * <br>
+     * 앞쪽에 있는 ROLE이 상위 ROLE 이다.
+     */
     @Bean
     public RoleHierarchy roleHierarchy() {
         String hierarchy = Stream.of(UserRole.MASTER, UserRole.MANAGER, UserRole.OWNER, UserRole.CUSTOMER)
