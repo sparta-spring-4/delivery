@@ -4,9 +4,10 @@ import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.infrastructure.event.Events;
 import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.payment.application.dto.ConfirmTossPayment;
-import com.zts.delivery.payment.application.dto.PayConfirmFailLogEvent;
-import com.zts.delivery.payment.application.dto.PaymentDoneEvent;
+import com.zts.delivery.payment.application.dto.PaymentFailLogEvent;
+import com.zts.delivery.payment.application.dto.PaymentConfirmDoneEvent;
 import com.zts.delivery.payment.domain.Payment;
+import com.zts.delivery.payment.domain.PaymentMethod;
 import com.zts.delivery.payment.domain.PaymentStatus;
 import com.zts.delivery.payment.domain.PaymentType;
 import com.zts.delivery.payment.domain.exception.PaymentPriceWrongException;
@@ -42,7 +43,7 @@ public class TossConfirmService {
         try {
             response = requestConfirmation(confirmTossPayment);
         } catch (TossClientErrorException e) {
-            PayConfirmFailLogEvent event = createPayPayConfirmFailLogEvent(userId, confirmTossPayment, e);
+            PaymentFailLogEvent event = createConfirmFailLogEvent(userId, confirmTossPayment, e);
             Events.trigger(event);
             throw e;
         }
@@ -51,7 +52,7 @@ public class TossConfirmService {
         paymentRepository.saveAndFlush(payment);
         log.info("결제 승인 완료 (orderId: {})", confirmTossPayment.orderId());
 
-        Events.trigger(new PaymentDoneEvent(payment.getOrderId()));
+        Events.trigger(new PaymentConfirmDoneEvent(payment.getOrderId()));
     }
 
     private TossPaymentClientResponse requestConfirmation(ConfirmTossPayment confirmTossPayment) {
@@ -71,16 +72,18 @@ public class TossConfirmService {
                 .requestedAt(response.requestedAt().toLocalDateTime())
                 .approvedAt(response.approvedAt().toLocalDateTime())
                 .userId(userId)
-                .status(PaymentStatus.DONE).type(PaymentType.TOSS)
+                .status(PaymentStatus.DONE)
+                .type(PaymentType.TOSS)
                 .build();
     }
 
-    private PayConfirmFailLogEvent createPayPayConfirmFailLogEvent(UserId userId, ConfirmTossPayment confirmTossPayment, TossClientErrorException e) {
-        return PayConfirmFailLogEvent.builder()
+    private PaymentFailLogEvent createConfirmFailLogEvent(UserId userId, ConfirmTossPayment confirmTossPayment, TossClientErrorException e) {
+        return PaymentFailLogEvent.builder()
                 .orderId(OrderId.of(UUID.fromString(confirmTossPayment.orderId())))
                 .userId(userId)
                 .paymentKey(confirmTossPayment.paymentKey())
                 .paymentType(PaymentType.TOSS)
+                .paymentMethod(PaymentMethod.CONFIRM)
                 .totalPrice(new Price(confirmTossPayment.amount()))
                 .httpStatus((HttpStatus) e.getStatusCode())
                 .errorCode(e.getCode())
