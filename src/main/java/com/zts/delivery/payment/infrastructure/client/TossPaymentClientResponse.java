@@ -1,9 +1,10 @@
-package com.zts.delivery.payment.infrastructure.client.confirm;
+package com.zts.delivery.payment.infrastructure.client;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-public record TossPaymentConfirmClientResponse(
+public record TossPaymentClientResponse(
         String mId,
         String lastTransactionKey,
         String paymentKey,
@@ -23,7 +24,7 @@ public record TossPaymentConfirmClientResponse(
         Object cashReceipt,
         List<Object> cashReceipts,
         Object discount,
-        List<Object> cancels,
+        List<Cancel> cancels,
         Object secret,
         String type,
         EasyPay easyPay,
@@ -72,6 +73,22 @@ public record TossPaymentConfirmClientResponse(
 
     public record Checkout(
             String url
+    ) {
+    }
+
+    public record Cancel(
+            String transactionKey,
+            String cancelReason,
+            long taxExemptionAmount,
+            LocalDateTime canceledAt,
+            long transferDiscountAmount,
+            long easyPayDiscountAmount,
+            String receiptKey,
+            long cancelAmount,
+            long taxFreeAmount,
+            long refundableAmount,
+            String cancelStatus,
+            String cancelRequestId
     ) {
     }
 }

@@ -8,6 +8,7 @@ import com.zts.delivery.payment.domain.repository.PaymentLogRepository;
 import com.zts.delivery.payment.infrastructure.client.TossClientErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +22,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class TossPaymentRetryScheduler {
+
+    private final ApplicationContext ctx;
 
     private final PaymentLogRepository paymentLogRepository;
     private final TossConfirmService tossConfirmService;
