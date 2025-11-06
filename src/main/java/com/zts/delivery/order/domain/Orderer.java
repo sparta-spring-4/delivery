@@ -23,7 +23,7 @@ public class Orderer {
     private String name;
 
     @Builder
-    public  Orderer(UserId id, String name) {
+    protected Orderer(UserId id, String name) {
         this.id = id;
         this.name = name;
     }

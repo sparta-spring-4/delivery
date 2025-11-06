@@ -1,12 +1,16 @@
 package com.zts.delivery.store.domain;
 
 import com.zts.delivery.global.persistence.common.BaseEntity;
+import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Objects;
+
+@ToString
 @Getter
 @Entity
 @Table(name = "P_STORE")
@@ -20,49 +24,26 @@ public class Store extends BaseEntity {
     @Embedded
     private Owner owner;
 
+    @Column(length = 100, nullable = false)
+    private String storeName;
+
+    @Column(length = 45, nullable = false)
+    private String storeTel;
+
     @Embedded
-    private OperationalInfo operationalInfo;
+    private StoreAddress address;
 
-    private String name;
-    private String address;
-    private String phone;
-    private String category;
-    private String content;
-    @Column(name = "store_picture_url")
-    private String picture;
-
-    private Double rating;
-    private Integer reviewCount;
-
-    // 영업 상태 여부 (0 = 영업 종료, 1 = 영업 중)
-    @Column(name = "is_open")
-    private boolean open;
+    @Embedded
+    private OperatingInfo operatingInfo;
 
     @Builder
-    public Store(Owner owner, String name, String address,
-                 String phone, String category, String content,
-                 String picture, OperationalInfo operationalInfo) {
-        this.owner = owner;
-        this.name = name;
-        this.address = address;
-        this.phone = phone;
-        this.category = category;
-        this.content = content;
-        this.picture = picture;
-        this.operationalInfo = operationalInfo;
+    public Store(StoreId id, String storeName, String storeTel, LocalTime startHour, LocalTime endHour, List<DayOfWeek> weekdays,
+                 UserId userId, String userName) {
 
-        this.rating = 0.0;
-        this.reviewCount = 0;
-        this.open = true;
-    }
-
-    // 영업 개시
-    public void openStore() {
-        this.open = true;
-    }
-
-    // 영업 종료
-    public void closeStore() {
-        this.open = false;
+        this.id = Objects.requireNonNullElse(id, StoreId.of());
+        this.owner = new Owner(userId, userName);
+        this.storeName = storeName;
+        this.storeTel = storeTel;
+        this.operatingInfo = new OperatingInfo(startHour, endHour, weekdays);
     }
 }

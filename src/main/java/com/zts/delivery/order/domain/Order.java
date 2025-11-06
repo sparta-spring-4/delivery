@@ -15,15 +15,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -61,10 +58,10 @@ public class Order extends BaseEntity {
     private OrderStatus status;
 
     @Builder
-    public Order(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo, OrderStatus status) {
+    public Order(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo) {
         this.orderer = orderer;
         this.deliveryInfo = deliveryInfo;
-        this.status = status;
+        this.status = OrderStatus.ORDER_ACCEPT;
         setOrderItems(orderItems);
         calculateTotalOrderPrice();
     }
@@ -74,10 +71,9 @@ public class Order extends BaseEntity {
             .orderer(orderer)
             .orderItems(orderItems)
             .deliveryInfo(deliveryInfo)
-            .status(OrderStatus.ORDER_ACCEPT)
             .build();
 
-        order.id = OrderId.of(UUID.randomUUID());
+        order.id = OrderId.of();
 
         return order;
     }
@@ -91,7 +87,7 @@ public class Order extends BaseEntity {
     }
 
     private void calculateTotalOrderPrice() {
-        this.totalOrderPrice = new Price(orderItems.stream().mapToInt(x -> x.getTotalPrice().getValue()).sum());
+        this.totalOrderPrice = new Price(orderItems.stream().mapToInt(x -> x.getPrice().getValue() * x.getQuantity()).sum());
     }
 
     // 주문 접수

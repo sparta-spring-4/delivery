@@ -1,8 +1,8 @@
-package com.zts.delivery.menu.domain;
+package com.zts.delivery.order.domain;
+
 
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
-import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -15,16 +15,14 @@ import lombok.ToString;
 @Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ItemOption {
-
-    @Column(nullable = false, length=60)
+public class OrderItemOption {
     private String name;
 
     @Convert(converter = PriceConverter.class)
     private Price price;
 
     @Builder
-    public ItemOption(String name, Price price) {
+    public OrderItemOption(String name, Price price) {
         this.name = name;
         this.price = price;
     }

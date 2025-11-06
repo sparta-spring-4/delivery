@@ -1,8 +1,10 @@
 package com.zts.delivery.store.domain;
 
 import com.zts.delivery.user.domain.UserId;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import lombok.*;
 
 @ToString
@@ -10,7 +12,9 @@ import lombok.*;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Owner {
-    @Column(name = "owner_id")
+
+    @Embedded
+    @AttributeOverride(name = "id", column = @Column(name = "owner_id"))
     private UserId id;
 
     @Column(name = "owner_name")
