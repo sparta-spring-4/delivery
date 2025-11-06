@@ -9,7 +9,9 @@ import com.zts.delivery.payment.application.dto.PaymentDoneEvent;
 import com.zts.delivery.payment.domain.Payment;
 import com.zts.delivery.payment.domain.PaymentStatus;
 import com.zts.delivery.payment.domain.PaymentType;
+import com.zts.delivery.payment.domain.exception.PaymentPriceWrongException;
 import com.zts.delivery.payment.domain.repository.PaymentRepository;
+import com.zts.delivery.payment.domain.service.PayOrderPriceValidator;
 import com.zts.delivery.payment.infrastructure.client.TossClientErrorException;
 import com.zts.delivery.payment.infrastructure.client.TossPaymentConfirmClient;
 import com.zts.delivery.payment.infrastructure.client.TossPaymentConfirmClientRequest;
@@ -32,8 +34,11 @@ public class TossConfirmService {
 
     private final TossPaymentConfirmClient confirmClient;
     private final PaymentRepository paymentRepository;
+    private final PayOrderPriceValidator orderPriceValidator;
 
     public void confirm(ConfirmTossPayment confirmTossPayment) {
+        priceOrderValidate(confirmTossPayment.orderId(), confirmTossPayment.amount());
+
         TossPaymentConfirmClientResponse response = null;
         try {
             response = requestConfirmation(confirmTossPayment);
@@ -89,5 +94,12 @@ public class TossConfirmService {
                 .errorMessage(e.getMessage())
                 .erroredAt(LocalDateTime.now())
                 .build();
+    }
+
+    private void priceOrderValidate(String orderId, int amount) {
+        boolean validated = orderPriceValidator.validate(OrderId.of(UUID.fromString(orderId)), new Price(amount));
+        if (validated) {
+            throw new PaymentPriceWrongException();
+        }
     }
 }

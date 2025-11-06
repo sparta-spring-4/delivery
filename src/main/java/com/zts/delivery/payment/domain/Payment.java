@@ -57,15 +57,5 @@ public class Payment extends DateAudit {
         this.type = type;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
-
-        // 주문 금액 검증
-//        validateOrder(orderId, totalPrice, validator);
     }
-
-    // 결제 전 주문금액 검증
-    /*private void validateOrder(OrderId orderId, Price totalPrice, PayOrderValidator validator) {
-        if (!validator.validate(orderId, totalPrice)) {
-            throw new PaymentPriceWrongException();
-        }
-    }*/
 }
