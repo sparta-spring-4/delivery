@@ -2,7 +2,7 @@ package com.zts.delivery.payment.presentation.controller;
 
 import com.zts.delivery.payment.application.dto.ConfirmTossPayment;
 import com.zts.delivery.payment.application.service.TossConfirmService;
-import com.zts.delivery.payment.infrastructure.client.TossPaymentConfirmClientRequest;
+import com.zts.delivery.payment.infrastructure.client.confirm.TossPaymentConfirmClientRequest;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
