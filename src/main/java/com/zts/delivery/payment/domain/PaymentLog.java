@@ -3,12 +3,14 @@ package com.zts.delivery.payment.domain;
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.common.DateAudit;
 import com.zts.delivery.order.domain.OrderId;
+import com.zts.delivery.payment.domain.converter.ConfirmErrorResponseConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
+
+import java.util.List;
 
 @Getter
 @Entity
@@ -18,7 +20,6 @@ public class PaymentLog extends DateAudit {
 
     @EmbeddedId
     private PaymentLogId id;
-
 
     @Embedded
     private OrderId orderId;
@@ -30,36 +31,37 @@ public class PaymentLog extends DateAudit {
     private String paymentKey;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "total_price"))
-    })
+    @AttributeOverride(name = "value", column = @Column(name = "total_price"))
     private Price totalPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 45)
     private PaymentErrorType errorType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 45)
-    private HttpStatus httpStatus;
+    @Lob
+    @Convert(converter = ConfirmErrorResponseConverter.class)
+    private List<ConfirmErrorResponse> errorResponses;
 
-    @Column(length = 100)
-    private String errorCode;
+    private boolean isSuccess;
 
-    @Column(length = 255)
-    private String errorMessage;
-
+    // 현재 시도가 몇 번째 시도인지
+    private int retryCount;
 
     @Builder
-    public PaymentLog(OrderId orderId, PaymentType paymentType, String paymentKey, Price totalPrice, PaymentErrorType errorType, HttpStatus httpStatus, String errorCode, String errorMessage) {
+    public PaymentLog(OrderId orderId, PaymentType paymentType, String paymentKey, Price totalPrice, PaymentErrorType errorType, List<ConfirmErrorResponse> errorResponses) {
         this.id = PaymentLogId.of();
         this.orderId = orderId;
-        this.paymentKey = paymentKey;
         this.paymentType = paymentType;
+        this.paymentKey = paymentKey;
         this.totalPrice = totalPrice;
         this.errorType = errorType;
-        this.httpStatus = httpStatus;
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
+        this.errorResponses = errorResponses;
+        this.isSuccess = false;
+        this.retryCount = 1;
+    }
+
+    public void addLogs(ConfirmErrorResponse errorResponse) {
+        errorResponses.add(errorResponse);
+        retryCount += 1;
     }
 }

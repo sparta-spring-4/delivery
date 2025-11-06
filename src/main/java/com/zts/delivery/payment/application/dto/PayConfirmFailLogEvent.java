@@ -6,14 +6,17 @@ import com.zts.delivery.payment.domain.PaymentType;
 import lombok.Builder;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
+
 @Builder
-public record PayConfirmFailLogEvent (
+public record PayConfirmFailLogEvent(
         OrderId orderId,
         PaymentType paymentType,
         String paymentKey,
         Price totalPrice,
         HttpStatus httpStatus,
         String errorCode,
-        String errorMessage
-){
+        String errorMessage,
+        LocalDateTime erroredAt
+) {
 }

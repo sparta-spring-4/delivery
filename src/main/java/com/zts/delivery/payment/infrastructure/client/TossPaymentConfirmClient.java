@@ -1,7 +1,6 @@
 package com.zts.delivery.payment.infrastructure.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.payment.infrastructure.config.TossPaymentKeyProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

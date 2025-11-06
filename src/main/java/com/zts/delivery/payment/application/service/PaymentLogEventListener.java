@@ -1,15 +1,18 @@
 package com.zts.delivery.payment.application.service;
 
 import com.zts.delivery.payment.application.dto.PayConfirmFailLogEvent;
+import com.zts.delivery.payment.domain.ConfirmErrorResponse;
 import com.zts.delivery.payment.domain.PaymentErrorType;
 import com.zts.delivery.payment.domain.PaymentLog;
-import com.zts.delivery.payment.domain.PaymentLogRepository;
+import com.zts.delivery.payment.domain.repository.PaymentLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,17 +31,28 @@ public class PaymentLogEventListener {
     public void handlePaymentFailedEvent(PayConfirmFailLogEvent event) {
         log.info("결제 실패 이벤트 수신, 로그 저장 시작 (orderId: {})", event.orderId());
 
-        PaymentLog paymentLog = PaymentLog.builder()
-                .orderId(event.orderId())
-                .paymentKey(event.paymentKey())
-                .totalPrice(event.totalPrice())
-                .paymentType(event.paymentType())
-                .errorType(PaymentErrorType.CONFIRM)
+        ConfirmErrorResponse errorResponse = ConfirmErrorResponse.builder()
                 .httpStatus(event.httpStatus())
                 .errorCode(event.errorCode())
                 .errorMessage(event.errorMessage())
+                .erroredAt(event.erroredAt())
                 .build();
 
+        PaymentLog paymentLog = null;
+        Optional<PaymentLog> paymentLogOpt = paymentLogRepository.findByOrderId(event.orderId());
+        if (paymentLogOpt.isPresent()) {
+            paymentLog = paymentLogOpt.get();
+            paymentLog.addLogs(errorResponse);
+        } else {
+            paymentLog = PaymentLog.builder()
+                    .orderId(event.orderId())
+                    .paymentKey(event.paymentKey())
+                    .totalPrice(event.totalPrice())
+                    .paymentType(event.paymentType())
+                    .errorType(PaymentErrorType.CONFIRM)
+                    .errorResponses(List.of(errorResponse))
+                    .build();
+        }
         paymentLogRepository.save(paymentLog);
         log.info("PaymentLog 저장 완료 (orderId: {})", event.orderId());
     }
