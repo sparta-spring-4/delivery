@@ -59,7 +59,7 @@ public class OrderService {
                 cartItem.getItemName(),
                 cartItem.getQuantity(),
                 convertCartItemsToOrderItemOptions(cartItem.getSelectedOptions(), cartItem.getId()),
-                cartItem.calculateTotalPrice()
+                cartItem.getTotalPrice()
             ))
             .toList();
     }
@@ -96,7 +96,8 @@ public class OrderService {
         return Order.create(
             orderer,
             orderItems,
-            deliveryInfo
+            deliveryInfo,
+            cart.getCartTotalPrice()
         );
     }
 }

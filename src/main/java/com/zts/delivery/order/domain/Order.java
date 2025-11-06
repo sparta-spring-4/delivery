@@ -58,20 +58,21 @@ public class Order extends BaseEntity {
     private OrderStatus status;
 
     @Builder
-    public Order(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo) {
+    public Order(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo, Price totalOrderPrice) {
         this.orderer = orderer;
         this.deliveryInfo = deliveryInfo;
         this.status = OrderStatus.ORDER_ACCEPT;
+        this.totalOrderPrice = totalOrderPrice;
         setOrderItems(orderItems);
-        calculateTotalOrderPrice();
     }
 
-    public static Order create(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo) {
+    public static Order create(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo, Price cartTotalPrice) {
 
         Order order = Order.builder()
             .orderer(orderer)
             .orderItems(orderItems)
             .deliveryInfo(deliveryInfo)
+            .totalOrderPrice(cartTotalPrice)
             .build();
 
         order.id = OrderId.of();
@@ -97,7 +98,6 @@ public class Order extends BaseEntity {
 
         // 결제 요청 이벤트 발생 시키기
         // Events.trigger(new OrderAcceptEvent(id));
-        return;
     }
 
     // 주문 취소

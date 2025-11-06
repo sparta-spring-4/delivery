@@ -44,64 +44,55 @@ public class CartItem {
     private Price price;
 
     @Convert(converter = PriceConverter.class)
-    private Price optionsPrice;
+    private Price totalPrice;
 
     @Builder
-    public CartItem(ItemId id, String itemName, int quantity, List<Integer> selectedOptions, Price price, Price optionsPrice) {
+    public CartItem(ItemId id, String itemName, int quantity, List<Integer> selectedOptions, Price price, Price totalPrice) {
         this.id = id;
         this.itemName = itemName;
         this.quantity = quantity;
         this.selectedOptions = (selectedOptions != null) ? new ArrayList<>(selectedOptions) : new ArrayList<>();
         this.price = price;
-        this.optionsPrice = optionsPrice;
+        this.totalPrice = totalPrice;
     }
 
-    public static CartItem create(Item item, List<Integer> selectedOptionIndices, int quantity) {
-
-        Price optionsPrice = item.getOptionsPrice(selectedOptionIndices);
+    public static CartItem create(Item item, List<Integer> selectedOptions) {
+        Price price = item.getPrice();
+        Price optionsPrice = item.getOptionsPrice(selectedOptions);
 
         return CartItem.builder()
             .id(item.getId())
             .itemName(item.getName())
-            .quantity(quantity)
-            .selectedOptions(selectedOptionIndices)
-            .price(item.getPrice())
-            .optionsPrice(optionsPrice)
+            .quantity(1)
+            .selectedOptions(selectedOptions)
+            .price(price)
+            .totalPrice(price.add(optionsPrice))
             .build();
     }
 
-    public CartItem updateQuantity(boolean isAdding) {
+    public void updateQuantity(boolean isAdding) {
         int newQuantity = this.quantity + (isAdding ? 1 : -1);
 
-        return CartItem.builder()
-            .id(this.id)
-            .itemName(this.itemName)
-            .quantity(newQuantity)
-            .selectedOptions(this.selectedOptions)
-            .price(this.price)
-            .optionsPrice(this.optionsPrice)
-            .build();
+        CartItem.builder()
+                .id(this.id)
+                .itemName(this.itemName)
+                .quantity(newQuantity)
+                .selectedOptions(this.selectedOptions)
+                .price(this.price)
+                .totalPrice(totalPrice.multiply(newQuantity))
+                .build();
     }
 
-    public CartItem chooseOptions(Item item, List<Integer> newIndices) {
+    public void updateOptions(Item item, List<Integer> newIndices) {
         Price newOptionsPrice = item.getOptionsPrice(newIndices);
 
-        return CartItem.builder()
+        CartItem.builder()
             .id(this.id)
             .itemName(this.itemName)
             .quantity(this.quantity)
             .selectedOptions(newIndices)
             .price(this.price)
-            .optionsPrice(newOptionsPrice)
+            .totalPrice(this.price.add(newOptionsPrice).multiply(this.quantity))
             .build();
-    }
-
-    public Price calculateTotalPrice() {
-        Price totalUnitPrice = calculateTotalUnitPrice();
-        return totalUnitPrice.multiply(this.quantity);
-    }
-
-    public Price calculateTotalUnitPrice() {
-        return this.price.add(this.optionsPrice);
     }
 }
