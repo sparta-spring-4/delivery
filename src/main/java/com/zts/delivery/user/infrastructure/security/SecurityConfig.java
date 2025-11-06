@@ -1,10 +1,13 @@
 package com.zts.delivery.user.infrastructure.security;
 
 
+import com.zts.delivery.user.domain.UserRole;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -12,6 +15,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Configuration
 @EnableMethodSecurity
@@ -33,6 +39,16 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler()));
         return http.build();
+    }
+
+    // ROLE_MASTER > ROLE_MANAGER > ROLE_OWNER > ROLE_CUSTOMER
+    // 앞쪽에 있는 ROLE이 상위 ROLE 이다.
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        String hierarchy = Stream.of(UserRole.MASTER, UserRole.MANAGER, UserRole.OWNER, UserRole.CUSTOMER)
+                .map(role -> "ROLE_" + role.name())
+                .collect(Collectors.joining(" > "));
+        return RoleHierarchyImpl.fromHierarchy(hierarchy);
     }
 
     /**
