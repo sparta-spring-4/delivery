@@ -1,6 +1,6 @@
 package com.zts.delivery.payment.application.service;
 
-import com.zts.delivery.payment.application.dto.PayConfirmFailLogEvent;
+import com.zts.delivery.payment.application.dto.PaymentFailLogEvent;
 import com.zts.delivery.payment.domain.ConfirmErrorResponse;
 import com.zts.delivery.payment.domain.PaymentLog;
 import com.zts.delivery.payment.domain.PaymentMethod;
@@ -28,7 +28,7 @@ public class PaymentLogEventListener {
      */
     @Async
     @EventListener
-    public void handlePaymentFailedEvent(PayConfirmFailLogEvent event) {
+    public void handlePaymentFailedEvent(PaymentFailLogEvent event) {
         log.warn("결제 실패 이벤트 수신, 로그 저장 시작 (orderId: {})", event.orderId());
 
         ConfirmErrorResponse errorResponse = ConfirmErrorResponse.builder()

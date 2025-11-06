@@ -46,8 +46,11 @@ public class Payment extends DateAudit {
 
     private LocalDateTime approvedAt;
 
+    private LocalDateTime canceledAt;
+
     @Builder
-    public Payment(OrderId orderId, UserId userId, Price totalPrice, String paymentKey, PaymentStatus status, PaymentType type, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+    public Payment(OrderId orderId, UserId userId, Price totalPrice, String paymentKey, PaymentStatus status,
+                   PaymentType type, LocalDateTime requestedAt, LocalDateTime approvedAt, LocalDateTime canceledAt) {
         this.id = PaymentId.of();
         this.orderId = orderId;
         this.userId = userId;
@@ -57,5 +60,11 @@ public class Payment extends DateAudit {
         this.type = type;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
+        this.canceledAt = canceledAt;
+    }
+
+    public void cancel(LocalDateTime canceledAt) {
+        this.canceledAt = canceledAt;
+        status = PaymentStatus.CANCELED;
     }
 }
