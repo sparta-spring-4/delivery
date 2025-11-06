@@ -3,7 +3,6 @@ package com.zts.delivery.payment.application.service;
 import com.zts.delivery.payment.application.dto.PaymentFailLogEvent;
 import com.zts.delivery.payment.domain.ConfirmErrorResponse;
 import com.zts.delivery.payment.domain.PaymentLog;
-import com.zts.delivery.payment.domain.PaymentMethod;
 import com.zts.delivery.payment.domain.repository.PaymentLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,7 @@ public class PaymentLogEventListener {
     @Async
     @EventListener
     public void handlePaymentFailedEvent(PaymentFailLogEvent event) {
-        log.warn("결제 실패 이벤트 수신, 로그 저장 시작 (orderId: {})", event.orderId());
+        log.warn("결제 실패 이벤트 수신, 로그 저장 시작 (method: {} orderId: {})", event.paymentMethod(), event.orderId());
 
         ConfirmErrorResponse errorResponse = ConfirmErrorResponse.builder()
                 .httpStatus(event.httpStatus())
@@ -50,11 +49,11 @@ public class PaymentLogEventListener {
                     .paymentKey(event.paymentKey())
                     .totalPrice(event.totalPrice())
                     .paymentType(event.paymentType())
-                    .paymentMethod(PaymentMethod.CONFIRM)
+                    .paymentMethod(event.paymentMethod())
                     .errorResponses(List.of(errorResponse))
                     .build();
         }
         paymentLogRepository.save(paymentLog);
-        log.info("PaymentLog 저장 완료 (orderId: {})", event.orderId());
+        log.info("PaymentLog 저장 완료 (method: {}, orderId: {})", event.paymentMethod(), event.orderId());
     }
 }
