@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -36,6 +38,8 @@ public class TossPaymentRetryScheduler {
                 false,
                 PageRequest.of(0, LOG_FIND_PAGE_SIZE));
 
+        List<PaymentLog> successToRetry = new ArrayList<>();
+
         for (PaymentLog failLog : failLogs) {
             String paymentKey = failLog.getPaymentKey();
             int totalPrice = failLog.getTotalPrice().getValue();
@@ -43,11 +47,10 @@ public class TossPaymentRetryScheduler {
             try {
                 tossConfirmService.confirm(failLog.getUserId(), new ConfirmTossPayment(orderId, paymentKey, totalPrice));
             } catch (TossClientErrorException e) {
-                log.warn("Payment retry failed for orderId: {}", failLog.getOrderId());
+                log.warn("결제 재시도 실패 (orderId: {})", failLog.getOrderId());
                 continue;
             }
-
-            log.warn("success to retry for orderId: {}", failLog.getOrderId());
+            log.info("결제 재시도 성공 (orderId: {})", failLog.getOrderId());
             failLog.success();
             paymentLogRepository.saveAllAndFlush(failLogs);
         }

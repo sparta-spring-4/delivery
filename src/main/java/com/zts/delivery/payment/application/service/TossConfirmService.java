@@ -35,6 +35,7 @@ public class TossConfirmService {
     private final PayOrderPriceValidator orderPriceValidator;
 
     public void confirm(UserId userId, ConfirmTossPayment confirmTossPayment) {
+        log.info("결제 승인 시작 (orderId: {})", confirmTossPayment.orderId());
         priceOrderValidate(confirmTossPayment.orderId(), confirmTossPayment.amount());
 
         TossPaymentConfirmClientResponse response = null;
@@ -48,6 +49,7 @@ public class TossConfirmService {
 
         Payment payment = createConfirmedPayment(userId, confirmTossPayment, response);
         paymentRepository.saveAndFlush(payment);
+        log.info("결제 승인 완료 (orderId: {})", confirmTossPayment.orderId());
 
         Events.trigger(new PaymentDoneEvent(payment.getOrderId()));
     }

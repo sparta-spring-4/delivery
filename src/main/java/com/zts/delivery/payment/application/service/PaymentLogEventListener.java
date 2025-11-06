@@ -29,7 +29,7 @@ public class PaymentLogEventListener {
     @Async
     @EventListener
     public void handlePaymentFailedEvent(PayConfirmFailLogEvent event) {
-        log.info("결제 실패 이벤트 수신, 로그 저장 시작 (orderId: {})", event.orderId());
+        log.warn("결제 실패 이벤트 수신, 로그 저장 시작 (orderId: {})", event.orderId());
 
         ConfirmErrorResponse errorResponse = ConfirmErrorResponse.builder()
                 .httpStatus(event.httpStatus())
