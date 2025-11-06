@@ -26,7 +26,7 @@ public class TossPaymentCancelClient {
 
     private final ObjectMapper objectMapper;
 
-    public TossPaymentClientResponse confirm(TossPaymentCancelClientRequest cancelRequest) {
+    public TossPaymentClientResponse cancel(TossPaymentCancelClientRequest cancelRequest) {
         String authorizations = "Basic " + encodingToBase64(properties.secretKey());
 
         String cancelUri = String.format(properties.cancel().uri(), cancelRequest.paymentKey());
