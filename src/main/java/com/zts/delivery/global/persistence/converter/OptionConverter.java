@@ -41,7 +41,12 @@ public class OptionConverter implements AttributeConverter<ItemOption, String> {
 
         String name = parts[0];
 
-        int priceValue = Integer.parseInt(parts[1]);
+        int priceValue;
+        try {
+            priceValue = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            throw new ApplicationException(ErrorCode.BAD_REQUEST);
+        }
 
         return new ItemOption(name, new Price(priceValue));
     }

@@ -88,7 +88,7 @@ public class Order extends BaseEntity {
     }
 
     private void calculateTotalOrderPrice() {
-        this.totalOrderPrice = new Price(orderItems.stream().mapToInt(x -> x.getPrice().getValue()).sum());
+        this.totalOrderPrice = new Price(orderItems.stream().mapToInt(x -> x.getPrice().getValue() * x.getQuantity()).sum());
     }
 
     // 주문 접수
