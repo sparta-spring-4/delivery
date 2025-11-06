@@ -52,9 +52,9 @@ public class TossPaymentRetryScheduler {
             }
             log.info("결제 재시도 성공 (orderId: {})", failLog.getOrderId());
             failLog.success();
-            paymentLogRepository.saveAllAndFlush(failLogs);
+            successToRetry.add(failLog);
         }
-
+        paymentLogRepository.saveAllAndFlush(successToRetry);
     }
 
 }
