@@ -1,0 +1,29 @@
+package com.zts.delivery.order.domain;
+
+
+import com.zts.delivery.global.persistence.Price;
+import com.zts.delivery.global.persistence.converter.PriceConverter;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@ToString
+@Getter
+@Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class OrderItemOption {
+    private String name;
+
+    @Convert(converter = PriceConverter.class)
+    private Price price;
+
+    @Builder
+    public OrderItemOption(String name, Price price) {
+        this.name = name;
+        this.price = price;
+    }
+}

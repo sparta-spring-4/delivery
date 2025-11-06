@@ -124,7 +124,7 @@ public class CartService {
         CartItem cartItem = t_cart.getCartItems().get(req.cartItemIndex());
         Item item = itemRepository.findById(cartItem.getId())
             .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
-        t_cart.changeItemOptions(cartItem, item, req.newOptionIndices());
+        t_cart.changeItemOptions(req.cartItemIndex(), item, req.newOptionIndices());
 
         Cart p_cart = cartRepository.save(t_cart);
         return CartResponse.of(p_cart);
