@@ -47,7 +47,7 @@ public class TossConfirmService {
         }
 
         Payment payment = createConfirmedPayment(userId, confirmTossPayment, response);
-        paymentRepository.save(payment);
+        paymentRepository.saveAndFlush(payment);
 
         Events.trigger(new PaymentDoneEvent(payment.getOrderId()));
     }

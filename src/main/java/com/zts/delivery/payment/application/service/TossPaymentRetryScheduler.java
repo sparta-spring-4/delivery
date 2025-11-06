@@ -8,10 +8,11 @@ import com.zts.delivery.payment.domain.repository.PaymentLogRepository;
 import com.zts.delivery.payment.infrastructure.client.TossClientErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -22,6 +23,7 @@ public class TossPaymentRetryScheduler {
     private final PaymentLogRepository paymentLogRepository;
     private final TossConfirmService tossConfirmService;
     private static final int RETRY_COUNT = 2;
+    private static final int LOG_FIND_PAGE_SIZE = 10;
 
     /**
      * 실패한 결제 재시도
@@ -29,7 +31,11 @@ public class TossPaymentRetryScheduler {
      */
     @Scheduled(fixedDelay = 1L, timeUnit = TimeUnit.SECONDS)
     public void retryConfirmPayment() {
-        List<PaymentLog> failLogs = paymentLogRepository.findByPaymentTypeAndPaymentMethodAndRetryCountIsLessThanEqualAndIsSuccess(PaymentType.TOSS, PaymentMethod.CONFIRM, RETRY_COUNT, false);
+        Page<PaymentLog> failLogs = paymentLogRepository.findFailLogs(PaymentType.TOSS,
+                PaymentMethod.CONFIRM, RETRY_COUNT,
+                false,
+                PageRequest.of(0, LOG_FIND_PAGE_SIZE));
+
         for (PaymentLog failLog : failLogs) {
             String paymentKey = failLog.getPaymentKey();
             int totalPrice = failLog.getTotalPrice().getValue();
@@ -43,6 +49,7 @@ public class TossPaymentRetryScheduler {
 
             log.warn("success to retry for orderId: {}", failLog.getOrderId());
             failLog.success();
+            paymentLogRepository.saveAllAndFlush(failLogs);
         }
 
     }
