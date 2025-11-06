@@ -4,8 +4,8 @@ import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.infrastructure.event.Events;
 import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.payment.application.dto.ConfirmTossPayment;
-import com.zts.delivery.payment.application.dto.PaymentFailLogEvent;
 import com.zts.delivery.payment.application.dto.PaymentConfirmDoneEvent;
+import com.zts.delivery.payment.application.dto.PaymentFailLogEvent;
 import com.zts.delivery.payment.domain.Payment;
 import com.zts.delivery.payment.domain.PaymentMethod;
 import com.zts.delivery.payment.domain.PaymentStatus;
@@ -48,7 +48,7 @@ public class TossConfirmService {
             throw e;
         }
 
-        Payment payment = createConfirmedPayment(userId, confirmTossPayment, response);
+        Payment payment = createConfirmedPayment(userId, response);
         paymentRepository.saveAndFlush(payment);
         log.info("결제 승인 완료 (orderId: {})", confirmTossPayment.orderId());
 
@@ -64,7 +64,7 @@ public class TossConfirmService {
         return confirmClient.confirm(request);
     }
 
-    private Payment createConfirmedPayment(UserId userId, ConfirmTossPayment confirmTossPayment, TossPaymentClientResponse response) {
+    private Payment createConfirmedPayment(UserId userId, TossPaymentClientResponse response) {
         return Payment.builder()
                 .paymentKey(response.paymentKey())
                 .orderId(OrderId.of(UUID.fromString(response.orderId())))
