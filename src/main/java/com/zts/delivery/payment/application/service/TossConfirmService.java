@@ -13,9 +13,9 @@ import com.zts.delivery.payment.domain.exception.PaymentPriceWrongException;
 import com.zts.delivery.payment.domain.repository.PaymentRepository;
 import com.zts.delivery.payment.domain.service.PayOrderPriceValidator;
 import com.zts.delivery.payment.infrastructure.client.TossClientErrorException;
+import com.zts.delivery.payment.infrastructure.client.TossPaymentClientResponse;
 import com.zts.delivery.payment.infrastructure.client.confirm.TossPaymentConfirmClient;
 import com.zts.delivery.payment.infrastructure.client.confirm.TossPaymentConfirmClientRequest;
-import com.zts.delivery.payment.infrastructure.client.confirm.TossPaymentConfirmClientResponse;
 import com.zts.delivery.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class TossConfirmService {
         log.info("결제 승인 시작 (orderId: {})", confirmTossPayment.orderId());
         priceOrderValidate(confirmTossPayment.orderId(), confirmTossPayment.amount());
 
-        TossPaymentConfirmClientResponse response = null;
+        TossPaymentClientResponse response = null;
         try {
             response = requestConfirmation(confirmTossPayment);
         } catch (TossClientErrorException e) {
@@ -54,7 +54,7 @@ public class TossConfirmService {
         Events.trigger(new PaymentDoneEvent(payment.getOrderId()));
     }
 
-    private TossPaymentConfirmClientResponse requestConfirmation(ConfirmTossPayment confirmTossPayment) {
+    private TossPaymentClientResponse requestConfirmation(ConfirmTossPayment confirmTossPayment) {
         TossPaymentConfirmClientRequest request = TossPaymentConfirmClientRequest.builder()
                 .orderId(confirmTossPayment.orderId())
                 .amount(confirmTossPayment.amount())
@@ -63,7 +63,7 @@ public class TossConfirmService {
         return confirmClient.confirm(request);
     }
 
-    private Payment createConfirmedPayment(UserId userId, ConfirmTossPayment confirmTossPayment, TossPaymentConfirmClientResponse response) {
+    private Payment createConfirmedPayment(UserId userId, ConfirmTossPayment confirmTossPayment, TossPaymentClientResponse response) {
         return Payment.builder()
                 .paymentKey(response.paymentKey())
                 .orderId(OrderId.of(UUID.fromString(response.orderId())))
