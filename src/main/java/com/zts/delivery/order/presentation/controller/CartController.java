@@ -8,8 +8,7 @@ import com.zts.delivery.order.presentation.dto.CartResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/cart")
@@ -28,12 +28,10 @@ public class CartController {
 
     private final CartService cartService;
 
-    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
-
     @Operation(summary = "장바구니 담기", description = "아이템id를 통해서 장바구니에 물건을 담습니다.")
     @PostMapping
     public CartResponse createCart(@RequestBody @Valid CartRequest req, @AuthenticationPrincipal UserPrincipal user) {
-        logger.info("Request: {}, UserId: {}", req, user.userId());
+        log.info("Request: {}, UserId: {}", req, user.userId());
 
         CartResponse response = cartService.create(req, user.userId());
 
@@ -49,7 +47,7 @@ public class CartController {
     @Operation(summary = "장바구니 변경", description = "장바구니에 담긴 아이템 변경")
     @PatchMapping
     public CartResponse changeCartItemQuantity(@RequestBody @Valid CartUpdateRequest req, @AuthenticationPrincipal UserPrincipal user) {
-        logger.info("Request: {}, UserId: {}", req, user.userId());
+        log.info("Request: {}, UserId: {}", req, user.userId());
 
         CartResponse response = cartService.update(req, user.userId());
 
@@ -65,7 +63,7 @@ public class CartController {
     @Operation(summary = "장바구니 품목 옵션 변경", description = "장바구니에 담긴 아이템 옵션 변경")
     @PatchMapping("/options")
     public CartResponse changeCartItemOptions(@RequestBody @Valid CartItemOptionUpdateRequest req, @AuthenticationPrincipal UserPrincipal user) {
-        logger.info("Request: {}, UserId: {}", req, user.userId());
+        log.info("Request: {}, UserId: {}", req, user.userId());
         CartResponse response = cartService.updateItemOptions(req, user.userId());
         return ResponseEntity.status(HttpStatus.OK).body(response).getBody();
     }

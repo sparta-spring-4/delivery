@@ -79,7 +79,7 @@ public class Cart extends DateAudit {
     private void calculateTotalPrice() {
         Price newTotal = new Price(0);
         for (CartItem item : this.cartItems) {
-            newTotal = newTotal.add(item.calculateItemPrice());
+            newTotal = newTotal.add(item.calculateTotalPrice());
         }
         this.price = newTotal;
     }
@@ -93,14 +93,24 @@ public class Cart extends DateAudit {
     }
 
 
-    public void changeItemOptions(CartItem cartItem, Item item, List<Integer> options) {
+    public void changeItemOptions(int idx, Item item, List<Integer> options) {
 
-        // 검증 로직
+        // 1. 해당 인덱스의 *기존* CartItem을 가져옵니다.
+        CartItem oldCartItem = this.cartItems.get(idx);
+
+        // 2. 검증 로직 (Item 객체가 필요합니다)
         if(!isValidOptionIndices(item, options)) {
             throw new IllegalArgumentException("Invalid option indices");
         }
-        // 옵션을 변경하여 해당하는 item 객체 반환
-        cartItem.chooseOptions(item, options);
+
+        // 3. *새로운* 옵션으로 *새로운* CartItem 객체를 생성합니다.
+        CartItem newCartItem = oldCartItem.chooseOptions(item, options);
+
+        // 4. [핵심] 리스트에서 기존 객체를 새로운 객체로 교체합니다.
+        this.cartItems.set(idx, newCartItem);
+
+        // 5. [누락된 부분] 총액을 다시 계산합니다.
+        calculateTotalPrice();
     }
 
     private boolean isValidOptionIndices(Item item, List<Integer> optionIndices) {
