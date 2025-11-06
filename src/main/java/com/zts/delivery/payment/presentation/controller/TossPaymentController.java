@@ -27,9 +27,8 @@ public class TossPaymentController {
                 .orderId(req.orderId())
                 .paymentKey(req.paymentKey())
                 .amount(req.amount())
-                .userId(user.userId().getId().toString())
                 .build();
 
-        tossConfirmService.confirm(confirmTossPayment);
+        tossConfirmService.confirm(user.userId(), confirmTossPayment);
     }
 }

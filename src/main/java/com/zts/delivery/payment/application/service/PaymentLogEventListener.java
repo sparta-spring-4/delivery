@@ -2,8 +2,8 @@ package com.zts.delivery.payment.application.service;
 
 import com.zts.delivery.payment.application.dto.PayConfirmFailLogEvent;
 import com.zts.delivery.payment.domain.ConfirmErrorResponse;
-import com.zts.delivery.payment.domain.PaymentErrorType;
 import com.zts.delivery.payment.domain.PaymentLog;
+import com.zts.delivery.payment.domain.PaymentMethod;
 import com.zts.delivery.payment.domain.repository.PaymentLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,14 +42,15 @@ public class PaymentLogEventListener {
         Optional<PaymentLog> paymentLogOpt = paymentLogRepository.findByOrderId(event.orderId());
         if (paymentLogOpt.isPresent()) {
             paymentLog = paymentLogOpt.get();
-            paymentLog.addLogs(errorResponse);
+            paymentLog.addLog(errorResponse);
         } else {
             paymentLog = PaymentLog.builder()
                     .orderId(event.orderId())
+                    .userId(event.userId())
                     .paymentKey(event.paymentKey())
                     .totalPrice(event.totalPrice())
                     .paymentType(event.paymentType())
-                    .errorType(PaymentErrorType.CONFIRM)
+                    .paymentMethod(PaymentMethod.CONFIRM)
                     .errorResponses(List.of(errorResponse))
                     .build();
         }

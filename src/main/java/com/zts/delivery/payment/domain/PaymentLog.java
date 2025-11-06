@@ -4,6 +4,7 @@ import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.common.DateAudit;
 import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.payment.domain.converter.ConfirmErrorResponseConverter;
+import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,6 +23,9 @@ public class PaymentLog extends DateAudit {
     private PaymentLogId id;
 
     @Embedded
+    private UserId userId;
+
+    @Embedded
     private OrderId orderId;
 
     @Enumerated(EnumType.STRING)
@@ -36,7 +40,7 @@ public class PaymentLog extends DateAudit {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 45)
-    private PaymentErrorType errorType;
+    private PaymentMethod paymentMethod;
 
     @Lob
     @Convert(converter = ConfirmErrorResponseConverter.class)
@@ -48,20 +52,25 @@ public class PaymentLog extends DateAudit {
     private int retryCount;
 
     @Builder
-    public PaymentLog(OrderId orderId, PaymentType paymentType, String paymentKey, Price totalPrice, PaymentErrorType errorType, List<ConfirmErrorResponse> errorResponses) {
+    public PaymentLog(OrderId orderId, UserId userId, PaymentType paymentType, String paymentKey, Price totalPrice, PaymentMethod paymentMethod, List<ConfirmErrorResponse> errorResponses) {
         this.id = PaymentLogId.of();
         this.orderId = orderId;
+        this.userId = userId;
         this.paymentType = paymentType;
         this.paymentKey = paymentKey;
         this.totalPrice = totalPrice;
-        this.errorType = errorType;
+        this.paymentMethod = paymentMethod;
         this.errorResponses = errorResponses;
         this.isSuccess = false;
-        this.retryCount = 1;
+        this.retryCount = 0;
     }
 
-    public void addLogs(ConfirmErrorResponse errorResponse) {
+    public void addLog(ConfirmErrorResponse errorResponse) {
         errorResponses.add(errorResponse);
         retryCount += 1;
+    }
+
+    public void success() {
+        isSuccess = true;
     }
 }
