@@ -1,4 +1,4 @@
-package com.zts.delivery.payment.infrastructure.client;
+package com.zts.delivery.payment.infrastructure.client.confirm;
 
 import lombok.Builder;
 
