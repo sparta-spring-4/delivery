@@ -51,3 +51,7 @@ keycloak:
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
   admin-username: ${KEYCLOAK_ADMIN_USERNAME}
   admin-password: ${KEYCLOAK_ADMIN_PASSWORD}
+
+kakao:
+  restapi:
+    key: ${KAKAO_REST_API_KEY}

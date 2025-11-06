@@ -36,14 +36,27 @@ public class Store extends BaseEntity {
     @Embedded
     private OperatingInfo operatingInfo;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "P_STORE_CATEGORY", joinColumns = @JoinColumn(name = "store_id"))
+    @OrderColumn(name = "category_idx")
+    private List<StoreCategory> categories;
+
     @Builder
     public Store(StoreId id, String storeName, String storeTel, LocalTime startHour, LocalTime endHour, List<DayOfWeek> weekdays,
-                 UserId userId, String userName) {
+                 UserId userId, String userName, StoreAddress address, List<StoreCategory> categories) {
 
         this.id = Objects.requireNonNullElse(id, StoreId.of());
         this.owner = new Owner(userId, userName);
         this.storeName = storeName;
         this.storeTel = storeTel;
         this.operatingInfo = new OperatingInfo(startHour, endHour, weekdays);
+        this.address = address;
+        setCategories(categories);
+    }
+
+    private void setCategories(List<StoreCategory> categories) {
+        if (categories == null || categories.isEmpty()) return;
+
+        this.categories = categories.stream().distinct().toList();
     }
 }
