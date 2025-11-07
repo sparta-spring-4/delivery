@@ -25,7 +25,7 @@ public class PaymentLogCustomRepositoryImpl implements PaymentLogCustomRepositor
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(paymentLog.paymentType.eq(paymentType))
                 .and(paymentLog.paymentMethod.eq(paymentMethod))
-                .and(paymentLog.retryCount.loe(retryCount))
+                .and(paymentLog.retryCount.lt(retryCount))
                 .and(paymentLog.isSuccess.eq(isSuccess));
 
         List<PaymentLog> content = queryFactory.selectFrom(paymentLog)

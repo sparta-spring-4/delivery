@@ -38,10 +38,10 @@ public class TossCancelService {
         TossPaymentClientResponse cancelClientResponse = null;
         try {
             cancelClientResponse = cancelClient.cancel(new TossPaymentCancelClientRequest(payment.getPaymentKey(),
-                    cancelTossPayment.refundReason(), cancelTossPayment.cancelAmount().getValue()));
+                    cancelTossPayment.cancelReason(), cancelTossPayment.cancelAmount().getValue()));
         } catch (TossClientErrorException e) {
             PaymentFailLogEvent cancelFailLogEvent = createCancelFailLogEvent(payment.getUserId(), payment.getOrderId(),
-                    cancelTossPayment.cancelAmount(), payment.getPaymentKey(), e);
+                    cancelTossPayment.cancelAmount(), payment.getPaymentKey(), cancelTossPayment.cancelReason(), e);
             Events.trigger(cancelFailLogEvent);
             throw e;
         }
@@ -52,6 +52,7 @@ public class TossCancelService {
     private PaymentFailLogEvent createCancelFailLogEvent(UserId userId, OrderId orderId,
                                                          Price refundAmount,
                                                          String paymentKey,
+                                                         String cancelReason,
                                                          TossClientErrorException e) {
         return PaymentFailLogEvent.builder()
                 .orderId(orderId)
@@ -64,6 +65,7 @@ public class TossCancelService {
                 .errorCode(e.getCode())
                 .errorMessage(e.getMessage())
                 .erroredAt(LocalDateTime.now())
+                .cancelReason(cancelReason)
                 .build();
     }
 }
