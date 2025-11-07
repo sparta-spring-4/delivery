@@ -3,6 +3,7 @@ package com.zts.delivery.user.domain.repository;
 import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserAddress;
 import com.zts.delivery.user.domain.UserId;
+import com.zts.delivery.user.domain.UserRole;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +26,6 @@ public interface UserRepository {
     List<UserAddress> addAddress(UserId userId, UserAddress userAddress);
 
     void deleteAddress(UserId userId, UUID addressId);
+
+    void changeUserRole(UserId userId, UserRole role);
 }

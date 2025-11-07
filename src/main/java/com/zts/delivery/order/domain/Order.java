@@ -67,7 +67,6 @@ public class Order extends BaseEntity {
     }
 
     public static Order create(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo) {
-
         Order order = Order.builder()
             .orderer(orderer)
             .orderItems(orderItems)

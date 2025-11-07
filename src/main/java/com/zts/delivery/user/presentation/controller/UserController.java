@@ -93,10 +93,16 @@ public class UserController {
         userService.deleteUserAddress(principal.userId(), addressId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER')")
     @GetMapping("/profile/{userId}")
     public UserResponse userProfile(@PathVariable("userId") String userId) {
         UserProfile userProfile = userService.getUserProfile(UserId.of(userId));
         return UserResponse.of(userProfile);
+    }
+    @PreAuthorize("hasRole('MANAGER')")
+    @PostMapping("/change-role")
+    public void changeRole(@RequestBody ChangeUserRoleRequest req) {
+        ChangeUserRole changeUserRole = req.toServiceDto();
+        userService.changeUserRole(changeUserRole);
     }
 }

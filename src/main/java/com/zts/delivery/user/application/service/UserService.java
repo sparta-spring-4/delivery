@@ -24,7 +24,7 @@ public class UserService {
     public void register(UserRegister dto, LocalDateTime registeredAt) {
         checkDuplicatedUsername(dto.username());
         checkDuplicatedEmail(dto.email());
-        User user = dto.toUser(List.of(UserRole.USER), registeredAt);
+        User user = dto.toUser(List.of(UserRole.CUSTOMER), registeredAt);
         userRepository.save(user);
     }
 
@@ -83,5 +83,9 @@ public class UserService {
 
     public void deleteUserAddress(UserId userId, UUID targetAddressId) {
         userRepository.deleteAddress(userId, targetAddressId);
+    }
+
+    public void changeUserRole(ChangeUserRole changeUserRole) {
+        userRepository.changeUserRole(changeUserRole.userId(), changeUserRole.role());
     }
 }

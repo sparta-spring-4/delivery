@@ -7,6 +7,7 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -153,6 +154,16 @@ public class KeycloakUserRepository implements UserRepository {
         keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).update(representation);
     }
 
+    @Override
+    public void changeUserRole(UserId userId, UserRole role) {
+        RoleScopeResource resource = keycloak.realm(properties.getRealm()).users().get(userId.getId().toString()).roles().realmLevel();
+        // 기존 Role 제거
+        resource.remove(resource.listAll());
+        // 새 Role 추가
+        RoleRepresentation representation = keycloak.realm(properties.getRealm()).roles().get(ROLE_PREFIX + role.name()).toRepresentation();
+        resource.add(List.of(representation));
+    }
+
     private User saveUser(User user) {
         UserRepresentation userRepresentation = createUserRepresentation(user);
         setUserAttribute(userRepresentation, user);
@@ -161,7 +172,7 @@ public class KeycloakUserRepository implements UserRepository {
 
         String userId = CreatedResponseUtil.getCreatedId(response);
         setPassword(userId, user.getPassword());
-        setRole(userId, UserRole.USER);
+        setRole(userId, user.getRoles().getFirst());
 
         return findById(UserId.of(UUID.fromString(userId)))
                 .orElseThrow(() -> new IllegalStateException("Keycloak 사용자 생성 후 데이터를 찾을 수 없습니다. (내부 오류)"));
