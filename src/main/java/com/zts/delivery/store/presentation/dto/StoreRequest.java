@@ -10,9 +10,9 @@ import java.util.List;
 
 @Builder
 public record StoreRequest(
-        @NotBlank String storeName,
-        @NotBlank String storeAddress,
-        @NotBlank String storeTel,
+        @NotBlank(message = "매장명을 입력하세요.") String storeName,
+        @NotBlank(message = "매장 주소를 입력하세요.") String storeAddress,
+        @NotBlank(message = "매장 전화번호를 입력하세요.") String storeTel,
 
         @DateTimeFormat(pattern = "HH:mm")
         LocalTime startHour,
