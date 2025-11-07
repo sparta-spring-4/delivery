@@ -26,7 +26,7 @@ public class PaymentLogEventListener {
      */
     @Async
     @EventListener
-    public void handlePaymentFailedEvent(PaymentFailLogEvent event) {
+    public void handle(PaymentFailLogEvent event) {
         log.warn("결제 실패 이벤트 수신, 로그 저장 시작 (method: {} orderId: {})", event.paymentMethod(), event.orderId());
         PaymentErrorResponse errorResponse = createErrorResponse(event);
 
