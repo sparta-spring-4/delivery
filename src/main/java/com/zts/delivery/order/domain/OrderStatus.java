@@ -1,7 +1,7 @@
 package com.zts.delivery.order.domain;
 
 public enum OrderStatus {
-    ORDER_ACCEPT,
+    ORDER_CREATED,
     PAYMENT_CONFIRM,
     PREPARING,
     DELIVERING,

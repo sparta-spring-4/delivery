@@ -7,6 +7,7 @@ import com.zts.delivery.menu.domain.ItemOption;
 import com.zts.delivery.menu.domain.ItemRepository;
 import com.zts.delivery.order.domain.DeliveryInfo;
 import com.zts.delivery.order.domain.Order;
+import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.order.domain.OrderItem;
 import com.zts.delivery.order.domain.OrderItemOption;
 import com.zts.delivery.order.domain.OrderRepository;
@@ -17,12 +18,17 @@ import com.zts.delivery.order.domain.cart.CartItem;
 import com.zts.delivery.order.domain.cart.CartRepository;
 import com.zts.delivery.order.presentation.dto.OrderRequest;
 import com.zts.delivery.order.presentation.dto.OrderResponse;
+import com.zts.delivery.order.presentation.dto.OrderStatusChangeRequest;
+import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserId;
+import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -50,6 +56,24 @@ public class OrderService {
         // 이벤트 발생
         return OrderResponse.of(p_order);
 
+    }
+
+    @Transactional
+    public void reject(OrderId orderId, UserId userId) {
+        Order t_order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+        t_order.cancel();
+        Order p_order = orderRepository.save(t_order);
+    }
+
+
+
+    @Transactional
+    public void cancel(OrderId orderId, UserId userId) {
+        Order t_order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+        t_order.cancel();
+        Order p_order = orderRepository.save(t_order);
     }
 
     private List<OrderItem> convertCartItemsToOrderItems(Cart cart) {
@@ -99,5 +123,52 @@ public class OrderService {
             deliveryInfo,
             cart.getCartTotalPrice()
         );
+    }
+
+    @Transactional
+    public void acceptOrder(OrderId orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "주문을 찾을 수 없습니다."));
+
+        order.accept();
+    }
+
+    @Transactional
+    public void updateToDelivering(OrderId orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "주문을 찾을 수 없습니다."));
+        order.delivery();
+    }
+
+    @Transactional
+    public void updateToDelivered(OrderId orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "주문을 찾을 수 없습니다."));
+        order.delivered();
+    }
+
+    public void delete(OrderId id, UserPrincipal user) {
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+        if (!order.getOrderer().getId().equals(user.userId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN);
+        }
+        order.markAsDeleted(user.username());
+    }
+
+    public OrderResponse read(OrderId id, UserPrincipal user) {
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+        if (!order.getOrderer().getId().equals(user.userId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN);
+        }
+        return OrderResponse.of(order);
+    }
+
+    public List<OrderResponse> readAll(UserPrincipal user) {
+        List<Order> orders = orderRepository.findAllByUserUuid(user.userId().getId());
+        return orders.stream()
+            .map(OrderResponse::of)
+            .toList();
     }
 }
