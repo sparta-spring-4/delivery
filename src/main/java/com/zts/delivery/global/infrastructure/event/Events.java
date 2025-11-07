@@ -1,4 +1,4 @@
-package com.zts.delivery.infrastructure.event;
+package com.zts.delivery.global.infrastructure.event;
 
 import org.springframework.context.ApplicationEventPublisher;
 
