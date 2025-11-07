@@ -86,6 +86,13 @@ public class Order extends BaseEntity {
         }
     }
 
+    public void paymentComplete() {
+        if (this.status != OrderStatus.ORDER_CREATED) {
+            return;
+        }
+        this.status = OrderStatus.PAYMENT_CONFIRM;
+    }
+
     public void accept() {
         if (this.status != OrderStatus.PAYMENT_CONFIRM) {
             return;
@@ -105,5 +112,12 @@ public class Order extends BaseEntity {
             return;
         }
         this.status = OrderStatus.DELIVERED;
+    }
+
+    public void refundComplete() {
+        if (this.status == OrderStatus.ORDER_CANCEL || this.status == OrderStatus.PAYMENT_CONFIRM) {
+            this.status = OrderStatus.ORDER_REFUND;
+        }
+        return;
     }
 }
