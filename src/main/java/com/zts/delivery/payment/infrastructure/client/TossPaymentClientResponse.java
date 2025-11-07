@@ -1,6 +1,5 @@
 package com.zts.delivery.payment.infrastructure.client;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -80,7 +79,7 @@ public record TossPaymentClientResponse(
             String transactionKey,
             String cancelReason,
             long taxExemptionAmount,
-            LocalDateTime canceledAt,
+            ZonedDateTime canceledAt,
             long transferDiscountAmount,
             long easyPayDiscountAmount,
             String receiptKey,

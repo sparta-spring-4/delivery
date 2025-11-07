@@ -57,6 +57,7 @@ public class PaymentLogEventListener {
                 .userId(event.userId())
                 .paymentKey(event.paymentKey())
                 .totalPrice(event.totalPrice())
+                .cancelReason(event.cancelReason())
                 .paymentType(event.paymentType())
                 .paymentMethod(event.paymentMethod())
                 .errorResponses(List.of(errorResponse))

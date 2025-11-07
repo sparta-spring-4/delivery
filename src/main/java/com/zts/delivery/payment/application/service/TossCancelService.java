@@ -45,7 +45,7 @@ public class TossCancelService {
             Events.trigger(cancelFailLogEvent);
             throw e;
         }
-        payment.cancel(cancelClientResponse.cancels().getFirst().canceledAt());
+        payment.cancel(cancelClientResponse.cancels().getFirst().canceledAt().toLocalDateTime());
         paymentRepository.saveAndFlush(payment);
     }
 
@@ -61,6 +61,7 @@ public class TossCancelService {
                 .paymentType(PaymentType.TOSS)
                 .paymentMethod(PaymentMethod.CANCEL)
                 .totalPrice(refundAmount)
+                .cancelReason(cancelReason)
                 .httpStatus((HttpStatus) e.getStatusCode())
                 .errorCode(e.getCode())
                 .errorMessage(e.getMessage())

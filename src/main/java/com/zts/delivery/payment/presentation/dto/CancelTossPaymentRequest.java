@@ -2,9 +2,9 @@ package com.zts.delivery.payment.presentation.dto;
 
 import java.util.UUID;
 
-public record TossPaymentConfirmRequest(
+public record CancelTossPaymentRequest(
         UUID orderId,
-        String paymentKey,
-        int amount
+        int cancelAmount,
+        String cancelReason
 ) {
 }
