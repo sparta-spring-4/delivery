@@ -18,14 +18,14 @@ import com.zts.delivery.order.domain.cart.CartItem;
 import com.zts.delivery.order.domain.cart.CartRepository;
 import com.zts.delivery.order.presentation.dto.OrderRequest;
 import com.zts.delivery.order.presentation.dto.OrderResponse;
-import com.zts.delivery.order.presentation.dto.OrderStatusChangeRequest;
-import com.zts.delivery.user.domain.User;
+import com.zts.delivery.order.application.dto.OrderCancelEvent;
 import com.zts.delivery.user.domain.UserId;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final ItemRepository itemRepository;
+
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public OrderResponse create(OrderRequest req, UserId userId) {
@@ -76,6 +78,14 @@ public class OrderService {
             .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
         t_order.cancel();
         Order p_order = orderRepository.save(t_order);
+
+        OrderCancelEvent event = new OrderCancelEvent(
+            orderId,
+            p_order.getTotalOrderPrice(),
+            "고객 요청"
+        );
+
+        publisher.publishEvent(event);
     }
 
     private List<OrderItem> convertCartItemsToOrderItems(Cart cart) {
