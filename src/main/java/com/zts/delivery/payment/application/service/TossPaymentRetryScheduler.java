@@ -81,12 +81,9 @@ public class TossPaymentRetryScheduler {
     }
 
     private void processSingleConfirmRetry(PaymentLog failLog) {
-        String paymentKey = failLog.getPaymentKey();
-        int totalPrice = failLog.getTotalPrice().getValue();
-        String orderId = failLog.getOrderId().getId().toString();
         try {
             failLog.retry();
-            tossConfirmService.confirm(failLog.getUserId(), new ConfirmTossPayment(orderId, paymentKey, totalPrice));
+            tossConfirmService.confirm(failLog.getUserId(), new ConfirmTossPayment(failLog.getOrderId(), failLog.getPaymentKey(), failLog.getTotalPrice()));
         } catch (TossClientErrorException e) {
             log.warn("결제 승인 재시도 실패 (orderId: {})", failLog.getOrderId());
             if (failLog.isMaxRetried(MAX_RETRY_COUNT)) {

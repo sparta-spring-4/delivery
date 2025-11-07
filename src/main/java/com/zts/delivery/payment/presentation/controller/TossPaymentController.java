@@ -1,5 +1,7 @@
 package com.zts.delivery.payment.presentation.controller;
 
+import com.zts.delivery.global.persistence.Price;
+import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.payment.application.dto.ConfirmTossPayment;
 import com.zts.delivery.payment.application.service.TossConfirmService;
 import com.zts.delivery.payment.infrastructure.client.confirm.TossPaymentConfirmClientRequest;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -24,9 +28,9 @@ public class TossPaymentController {
     public void confirm(@AuthenticationPrincipal UserPrincipal user,
                         @RequestBody TossPaymentConfirmClientRequest req) {
         ConfirmTossPayment confirmTossPayment = ConfirmTossPayment.builder()
-                .orderId(req.orderId())
+                .orderId(OrderId.of(UUID.fromString(req.orderId())))
                 .paymentKey(req.paymentKey())
-                .amount(req.amount())
+                .amount(new Price(req.amount()))
                 .build();
 
         tossConfirmService.confirm(user.userId(), confirmTossPayment);

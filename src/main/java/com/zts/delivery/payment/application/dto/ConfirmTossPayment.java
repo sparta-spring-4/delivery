@@ -1,11 +1,13 @@
 package com.zts.delivery.payment.application.dto;
 
+import com.zts.delivery.global.persistence.Price;
+import com.zts.delivery.order.domain.OrderId;
 import lombok.Builder;
 
 @Builder
 public record ConfirmTossPayment(
-        String orderId,
+        OrderId orderId,
         String paymentKey,
-        int amount
+        Price amount
 ) {
 }

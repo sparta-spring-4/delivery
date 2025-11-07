@@ -57,8 +57,8 @@ public class TossConfirmService {
 
     private TossPaymentClientResponse requestConfirmation(ConfirmTossPayment confirmTossPayment) {
         TossPaymentConfirmClientRequest request = TossPaymentConfirmClientRequest.builder()
-                .orderId(confirmTossPayment.orderId())
-                .amount(confirmTossPayment.amount())
+                .orderId(confirmTossPayment.orderId().getId().toString())
+                .amount(confirmTossPayment.amount().getValue())
                 .paymentKey(confirmTossPayment.paymentKey())
                 .build();
         return confirmClient.confirm(request);
@@ -79,12 +79,12 @@ public class TossConfirmService {
 
     private PaymentFailLogEvent createConfirmFailLogEvent(UserId userId, ConfirmTossPayment confirmTossPayment, TossClientErrorException e) {
         return PaymentFailLogEvent.builder()
-                .orderId(OrderId.of(UUID.fromString(confirmTossPayment.orderId())))
+                .orderId(confirmTossPayment.orderId())
                 .userId(userId)
                 .paymentKey(confirmTossPayment.paymentKey())
                 .paymentType(PaymentType.TOSS)
                 .paymentMethod(PaymentMethod.CONFIRM)
-                .totalPrice(new Price(confirmTossPayment.amount()))
+                .totalPrice(confirmTossPayment.amount())
                 .httpStatus((HttpStatus) e.getStatusCode())
                 .errorCode(e.getCode())
                 .errorMessage(e.getMessage())
@@ -92,8 +92,8 @@ public class TossConfirmService {
                 .build();
     }
 
-    private void priceOrderValidate(String orderId, int amount) {
-        boolean validated = orderPriceValidator.validate(OrderId.of(UUID.fromString(orderId)), new Price(amount));
+    private void priceOrderValidate(OrderId orderId, Price amount) {
+        boolean validated = orderPriceValidator.validate(orderId, amount);
         if (validated) {
             throw new PaymentPriceWrongException();
         }
