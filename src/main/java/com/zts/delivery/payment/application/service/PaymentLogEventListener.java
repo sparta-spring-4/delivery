@@ -42,7 +42,7 @@ public class PaymentLogEventListener {
         log.info("PaymentLog 저장 완료 (method: {}, orderId: {})", event.paymentMethod(), event.orderId());
     }
 
-    private static PaymentErrorResponse createErrorResponse(PaymentFailLogEvent event) {
+    private PaymentErrorResponse createErrorResponse(PaymentFailLogEvent event) {
         return PaymentErrorResponse.builder()
                 .httpStatus(event.httpStatus())
                 .errorCode(event.errorCode())
@@ -51,7 +51,7 @@ public class PaymentLogEventListener {
                 .build();
     }
 
-    private static PaymentLog createPaymentLog(PaymentFailLogEvent event, PaymentErrorResponse errorResponse) {
+    private PaymentLog createPaymentLog(PaymentFailLogEvent event, PaymentErrorResponse errorResponse) {
         return PaymentLog.builder()
                 .orderId(event.orderId())
                 .userId(event.userId())
