@@ -1,11 +1,16 @@
 package com.zts.delivery.store.presentation.controller;
 
+import com.zts.delivery.global.persistence.common.ListData;
 import com.zts.delivery.store.application.service.StoreCreateService;
 import com.zts.delivery.store.application.service.StoreDeleteService;
 import com.zts.delivery.store.application.service.StoreUpdateService;
 import com.zts.delivery.store.domain.Category;
+import com.zts.delivery.store.domain.StoreDetailsRepository;
 import com.zts.delivery.store.domain.StoreId;
+import com.zts.delivery.store.domain.dto.SearchDto;
+import com.zts.delivery.store.infrastructure.persistence.dto.StoreDto;
 import com.zts.delivery.store.presentation.dto.CategoryDto;
+import com.zts.delivery.store.presentation.dto.SearchRequest;
 import com.zts.delivery.store.presentation.dto.StoreRequest;
 import com.zts.delivery.store.presentation.dto.StoreResponse;
 import jakarta.validation.Valid;
@@ -15,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -25,6 +31,7 @@ public class StoreController {
     private final StoreCreateService createService;
     private final StoreUpdateService updateService;
     private final StoreDeleteService deleteService;
+    private final StoreDetailsRepository detailsRepository;
 
     /**
      * 매장 추가
@@ -102,6 +109,27 @@ public class StoreController {
     public void removeCategory(@PathVariable UUID storeId, @RequestBody List<Category> categories) {
 
         categories.forEach(c -> updateService.removeCategory(storeId, c));
+    }
+
+    /**
+     * 매장 검색
+     * @param request
+     * @return
+     */
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('USER', 'OWNER', 'MANAGER', 'MASTER')")
+    public ListData<StoreDto> searchStore(SearchRequest request) { // page, size
+        SearchDto search = SearchDto.builder()
+                .storeName(request.storeName())
+                .keyword(request.keyword())
+                .storeTel(request.storeTel())
+                .sido(request.sido())
+                .sigugun(request.sigugun())
+                .dong(request.dong())
+                .category(request.category())
+                .build();
+
+        return detailsRepository.findAll(search, Objects.requireNonNullElse(request.page(), 1), Objects.requireNonNullElse(request.size(), 20));
     }
 
 }

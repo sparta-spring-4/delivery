@@ -173,4 +173,16 @@ public class StoreControllerTest {
         System.out.println(store);
 
     }
+
+    @Test
+    @DisplayName("매장 검색 테스트")
+    @MockUser(roles="OWNER")
+    void searchStoreTest() throws Exception {
+        for(int i = 0; i < 10; i++)
+            createService.create(request);
+
+        mockMvc.perform(get("/v1/stores/search?sido=서울&category=KOREAN"))
+                .andDo(print());
+    }
+
 }
