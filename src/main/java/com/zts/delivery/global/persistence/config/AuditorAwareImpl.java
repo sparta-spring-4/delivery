@@ -1,5 +1,6 @@
 package com.zts.delivery.global.persistence.config;
 
+import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 import org.springframework.data.domain.AuditorAware;
@@ -12,11 +13,13 @@ public class AuditorAwareImpl implements AuditorAware<String> {
     @NotNull
     public Optional<String> getCurrentAuditor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return Optional.of("SYSTEM");
+        if (authentication == null || !authentication.isAuthenticated() ||
+            authentication.getPrincipal().equals("anonymousUser")) {
+            return Optional.empty();
         }
 
-        return Optional.of(authentication.getName());
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+
+        return Optional.of(principal.username());
     }
 }

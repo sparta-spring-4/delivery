@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -33,10 +34,20 @@ public class ApplicationExceptionHandler {
                 .stream().map(
                         it -> new FieldError(it.getField(), it.getRejectedValue(), it.getDefaultMessage())
                 ).toList();
+
+        List<FieldError> globalErrors = e.getBindingResult().getGlobalErrors()
+                .stream().map(
+                        it -> new FieldError("global", null, it.getDefaultMessage())
+                ).toList();
+
+        List<FieldError> allErrors = new ArrayList<>();
+        allErrors.addAll(fieldErrors);
+        allErrors.addAll(globalErrors);
+
         ErrorCode errorCode = ErrorCode.REQUEST_VALIDATION_ERROR;
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
-                .body(new ErrorResponse<>(errorCode.getCode(), errorCode.getMessage(), fieldErrors));
+                .body(new ErrorResponse<>(errorCode.getCode(), errorCode.getDefaultMessage(), allErrors));
     }
 
     @ExceptionHandler(value = Exception.class)
@@ -47,6 +58,6 @@ public class ApplicationExceptionHandler {
         return ResponseEntity
                 .status(internalServerError.getHttpStatus())
                 .body(
-                        new ErrorResponse<>(internalServerError.getCode(), internalServerError.getMessage(), null));
+                        new ErrorResponse<>(internalServerError.getCode(), internalServerError.getDefaultMessage(), null));
     }
 }

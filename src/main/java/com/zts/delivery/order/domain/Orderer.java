@@ -1,6 +1,6 @@
 package com.zts.delivery.order.domain;
 
-import com.zts.delivery.user.UserId;
+import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -23,7 +23,7 @@ public class Orderer {
     private String name;
 
     @Builder
-    public  Orderer(UserId id, String name) {
+    protected Orderer(UserId id, String name) {
         this.id = id;
         this.name = name;
     }
