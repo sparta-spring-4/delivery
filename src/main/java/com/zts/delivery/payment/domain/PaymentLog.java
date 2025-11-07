@@ -6,13 +6,11 @@ import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.payment.domain.converter.ConfirmErrorResponseConverter;
 import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
+@ToString
 @Getter
 @Entity
 @Table(name = "P_PAYMENT_LOGS")
@@ -66,15 +64,11 @@ public class PaymentLog extends DateAudit {
         this.paymentMethod = paymentMethod;
         this.errorResponses = errorResponses;
         this.isSuccess = false;
-        this.retryCount = 0;
         this.cancelReason = cancelReason;
     }
 
     public void addLog(PaymentErrorResponse errorResponse) {
         errorResponses.add(errorResponse);
-    }
-
-    public void retry() {
         retryCount += 1;
     }
 

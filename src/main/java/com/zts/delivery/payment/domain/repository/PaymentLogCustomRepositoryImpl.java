@@ -7,8 +7,6 @@ import com.zts.delivery.payment.domain.PaymentMethod;
 import com.zts.delivery.payment.domain.PaymentType;
 import com.zts.delivery.payment.domain.QPaymentLog;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -19,7 +17,7 @@ public class PaymentLogCustomRepositoryImpl implements PaymentLogCustomRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<PaymentLog> findFailLogs(PaymentType paymentType, PaymentMethod paymentMethod, int retryCount, boolean isSuccess, Pageable pageable) {
+    public List<PaymentLog> findFailLogs(PaymentType paymentType, PaymentMethod paymentMethod, int retryCount, boolean isSuccess, Pageable pageable) {
         QPaymentLog paymentLog = QPaymentLog.paymentLog;
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -28,22 +26,11 @@ public class PaymentLogCustomRepositoryImpl implements PaymentLogCustomRepositor
                 .and(paymentLog.retryCount.lt(retryCount))
                 .and(paymentLog.isSuccess.eq(isSuccess));
 
-        List<PaymentLog> content = queryFactory.selectFrom(paymentLog)
+        return queryFactory.selectFrom(paymentLog)
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-
-        Long total = queryFactory.select(paymentLog.count())
-                .from(paymentLog)
-                .where(builder)
-                .fetchOne();
-
-        if (total == null) {
-            total = 0L;
-        }
-
-        return new PageImpl<>(content, pageable, total);
     }
 
 }
