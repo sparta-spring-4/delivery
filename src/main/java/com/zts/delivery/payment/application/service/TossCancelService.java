@@ -1,11 +1,12 @@
 package com.zts.delivery.payment.application.service;
 
-import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.infrastructure.event.Events;
 import com.zts.delivery.global.infrastructure.execption.ApplicationException;
 import com.zts.delivery.global.infrastructure.execption.ErrorCode;
+import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.payment.application.dto.CancelTossPayment;
+import com.zts.delivery.payment.application.dto.PaymentCancelDoneEvent;
 import com.zts.delivery.payment.application.dto.PaymentFailLogEvent;
 import com.zts.delivery.payment.domain.Payment;
 import com.zts.delivery.payment.domain.PaymentMethod;
@@ -47,6 +48,8 @@ public class TossCancelService {
         }
         payment.cancel(cancelClientResponse.cancels().getFirst().canceledAt().toLocalDateTime());
         paymentRepository.saveAndFlush(payment);
+
+        Events.trigger(new PaymentCancelDoneEvent(payment.getOrderId()));
     }
 
     private PaymentFailLogEvent createCancelFailLogEvent(UserId userId, OrderId orderId,
