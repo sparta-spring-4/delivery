@@ -12,11 +12,11 @@ import com.zts.delivery.payment.domain.repository.PaymentLogRepository;
 import com.zts.delivery.payment.infrastructure.client.TossClientErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -37,7 +37,7 @@ public class TossPaymentRetryScheduler {
      */
     @Scheduled(fixedDelay = 1L, timeUnit = TimeUnit.SECONDS)
     public void retryConfirmPayment() {
-        Page<PaymentLog> failLogs = paymentLogRepository.findFailLogs(PaymentType.TOSS,
+        List<PaymentLog> failLogs = paymentLogRepository.findFailLogs(PaymentType.TOSS,
                 PaymentMethod.CONFIRM, MAX_RETRY_COUNT,
                 false,
                 PageRequest.of(0, LOG_FIND_PAGE_SIZE));
@@ -54,11 +54,10 @@ public class TossPaymentRetryScheduler {
      */
     @Scheduled(fixedDelay = 1L, timeUnit = TimeUnit.SECONDS)
     public void retryCancelPayment() {
-        Page<PaymentLog> failLogs = paymentLogRepository.findFailLogs(PaymentType.TOSS,
+        List<PaymentLog> failLogs = paymentLogRepository.findFailLogs(PaymentType.TOSS,
                 PaymentMethod.CANCEL, MAX_RETRY_COUNT,
                 false,
                 PageRequest.of(0, LOG_FIND_PAGE_SIZE));
-
         for (PaymentLog failLog : failLogs) {
             processSingleCancelRetry(failLog);
         }
@@ -67,7 +66,6 @@ public class TossPaymentRetryScheduler {
 
     private void processSingleCancelRetry(PaymentLog failLog) {
         try {
-            failLog.retry();
             tossCancelService.cancel(new CancelTossPayment(failLog.getOrderId(), failLog.getTotalPrice(), failLog.getCancelReason()));
         } catch (TossClientErrorException e) {
             log.warn("결제 취소 재시도 실패 (orderId: {})", failLog.getOrderId());
@@ -82,7 +80,6 @@ public class TossPaymentRetryScheduler {
 
     private void processSingleConfirmRetry(PaymentLog failLog) {
         try {
-            failLog.retry();
             tossConfirmService.confirm(failLog.getUserId(), new ConfirmTossPayment(failLog.getOrderId(), failLog.getPaymentKey(), failLog.getTotalPrice()));
         } catch (TossClientErrorException e) {
             log.warn("결제 승인 재시도 실패 (orderId: {})", failLog.getOrderId());
