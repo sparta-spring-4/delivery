@@ -26,6 +26,8 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -165,10 +167,11 @@ public class OrderService {
         return OrderResponse.of(order);
     }
 
-    public List<OrderResponse> readAll(UserPrincipal user) {
-        List<Order> orders = orderRepository.findAllByUserUuid(user.userId().getId());
-        return orders.stream()
-            .map(OrderResponse::of)
-            .toList();
+    public Page<OrderResponse> readAll(UserPrincipal user, Pageable pageable) {
+        Page<Order> orderPage = orderRepository.findAllByOrderer_Id_Id(
+            user.userId().getId(),
+            pageable
+        );
+        return orderPage.map(OrderResponse::of);
     }
 }

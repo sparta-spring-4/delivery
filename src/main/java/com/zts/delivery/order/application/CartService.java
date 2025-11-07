@@ -115,15 +115,17 @@ public class CartService {
 
     @Transactional
     public CartResponse updateItemOptions(@Valid CartItemOptionUpdateRequest req, UserId userId) {
-        // Find cart by ID
         Cart t_cart = cartRepository.findById(req.cartId())
             .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+
         if (!t_cart.getUserId().equals(userId)) {
             throw new ApplicationException(ErrorCode.FORBIDDEN);
         }
+
         CartItem cartItem = t_cart.getCartItems().get(req.cartItemIndex());
         Item item = itemRepository.findById(cartItem.getId())
             .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+
         t_cart.changeItemOptions(req.cartItemIndex(), item, req.newOptionIndices());
 
         Cart p_cart = cartRepository.save(t_cart);

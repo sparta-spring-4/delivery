@@ -13,6 +13,10 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -80,8 +84,8 @@ public class OrderController {
 
     @Operation(summary = "주문 목록 조회", description = "주문 목록 조회")
     @GetMapping("/list")
-    public ResponseEntity<List<OrderResponse>> getOrderList(@AuthenticationPrincipal UserPrincipal user) {
-        List<OrderResponse> response = orderService.readAll(user);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<Page<OrderResponse>> getOrderList(@AuthenticationPrincipal UserPrincipal user, @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<OrderResponse> responsePage = orderService.readAll(user, pageable);
+        return ResponseEntity.ok(responsePage);
     }
 }
