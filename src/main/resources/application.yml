@@ -58,6 +58,10 @@ keycloak:
   admin-username: ${KEYCLOAK_ADMIN_USERNAME}
   admin-password: ${KEYCLOAK_ADMIN_PASSWORD}
 
+kakao:
+  restapi:
+    key: ${KAKAO_REST_API_KEY}
+
 payment:
   toss:
     secret-key: ${TOSS_PAYMENT_SECRET_KEY}
