@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class TossCancelService {
 
-    private TossPaymentCancelClient cancelClient;
+    private final TossPaymentCancelClient cancelClient;
     private final PaymentRepository paymentRepository;
 
     public void cancel(CancelTossPayment cancelTossPayment) {
