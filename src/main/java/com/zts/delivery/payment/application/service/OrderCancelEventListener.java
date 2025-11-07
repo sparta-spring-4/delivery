@@ -2,7 +2,7 @@ package com.zts.delivery.payment.application.service;
 
 
 import com.zts.delivery.payment.application.dto.CancelTossPayment;
-import com.zts.delivery.payment.application.dto.OrderCancelEvent;
+import com.zts.delivery.order.application.dto.OrderCancelEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;

@@ -23,7 +23,7 @@ public record CartResponse(
             .cartId(cart.getId().getId())
             .userId(cart.getUserId().getId())
             .cartItemIds(cartItemIds)
-            .price(cart.getPrice())
+            .price(cart.getCartTotalPrice())
             .build();
     }
 }
