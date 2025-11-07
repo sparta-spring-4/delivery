@@ -108,15 +108,10 @@ public class Item extends BaseEntity {
     }
 
     public Price getOptionsPrice(List<Integer> selectedOptions) {
-        if (selectedOptions == null || selectedOptions.isEmpty()) {
-            return new Price(0);
-        }
-
-        Price totalOptionsPrice = new Price(0);
-        for (Integer idx : selectedOptions) {
-            totalOptionsPrice.add(itemOptions.get(idx).getPrice());
-        }
-
-        return totalOptionsPrice;
+        return (selectedOptions == null || selectedOptions.isEmpty())
+            ? new Price(0)
+            : new Price(selectedOptions.stream()
+                .map(idx -> itemOptions.get(idx).getPrice().getValue())
+                .reduce(0, Integer::sum));
     }
 }

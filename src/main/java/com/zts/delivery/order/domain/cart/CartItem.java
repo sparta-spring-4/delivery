@@ -70,10 +70,10 @@ public class CartItem {
             .build();
     }
 
-    public void updateQuantity(boolean isAdding) {
+    public CartItem updateQuantity(boolean isAdding) {
         int newQuantity = this.quantity + (isAdding ? 1 : -1);
 
-        CartItem.builder()
+        return CartItem.builder()
                 .id(this.id)
                 .itemName(this.itemName)
                 .quantity(newQuantity)

@@ -84,7 +84,7 @@ public class Cart extends DateAudit {
     public void changeItemQuantity(int idx, boolean isAdding) {
         isValidItemIndex(idx);
         CartItem item = this.cartItems.get(idx);
-        item.updateQuantity(isAdding);
+        CartItem cartItem = item.updateQuantity(isAdding);
         calculateTotalPrice();
     }
 
@@ -94,6 +94,12 @@ public class Cart extends DateAudit {
         CartItem oldCartItem = this.cartItems.get(idx);
 
         oldCartItem.updateOptions(item, options);
+        calculateTotalPrice();
+    }
+
+    public void deleteCartItem(int idx) {
+        isValidItemIndex(idx);
+        this.cartItems.remove(idx);
         calculateTotalPrice();
     }
 

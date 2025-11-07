@@ -59,7 +59,7 @@ public class CartService {
 
         CartItem cartItem = t_cart.getCartItems().get(idx);
         if (cartItem.getQuantity() == 1 && !adding) {
-            delete(userId);
+            t_cart.removeItem(idx);
         }
 
         t_cart.changeItemQuantity(idx, adding);
