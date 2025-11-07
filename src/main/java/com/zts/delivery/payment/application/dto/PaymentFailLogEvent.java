@@ -21,6 +21,7 @@ public record PaymentFailLogEvent(
         HttpStatus httpStatus,
         String errorCode,
         String errorMessage,
-        LocalDateTime erroredAt
+        LocalDateTime erroredAt,
+        String cancelReason
 ) {
 }

@@ -8,6 +8,6 @@ import lombok.Builder;
 public record CancelTossPayment(
         OrderId orderId,
         Price cancelAmount,
-        String refundReason
+        String cancelReason
 ) {
 }

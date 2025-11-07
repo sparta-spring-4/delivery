@@ -42,17 +42,21 @@ public class PaymentLog extends DateAudit {
     @Column(length = 45)
     private PaymentMethod paymentMethod;
 
+    private String cancelReason;
+
     @Lob
     @Convert(converter = ConfirmErrorResponseConverter.class)
-    private List<ConfirmErrorResponse> errorResponses;
+    private List<PaymentErrorResponse> errorResponses;
 
     private boolean isSuccess;
 
     // 현재 시도가 몇 번째 시도인지
     private int retryCount;
 
+
     @Builder
-    public PaymentLog(OrderId orderId, UserId userId, PaymentType paymentType, String paymentKey, Price totalPrice, PaymentMethod paymentMethod, List<ConfirmErrorResponse> errorResponses) {
+    public PaymentLog(OrderId orderId, UserId userId, PaymentType paymentType, String paymentKey, Price totalPrice,
+                      PaymentMethod paymentMethod, String cancelReason, List<PaymentErrorResponse> errorResponses) {
         this.id = PaymentLogId.of();
         this.orderId = orderId;
         this.userId = userId;
@@ -63,11 +67,19 @@ public class PaymentLog extends DateAudit {
         this.errorResponses = errorResponses;
         this.isSuccess = false;
         this.retryCount = 0;
+        this.cancelReason = cancelReason;
     }
 
-    public void addLog(ConfirmErrorResponse errorResponse) {
+    public void addLog(PaymentErrorResponse errorResponse) {
         errorResponses.add(errorResponse);
+    }
+
+    public void retry() {
         retryCount += 1;
+    }
+
+    public boolean isMaxRetried(int maxRetryCount) {
+        return this.retryCount >= maxRetryCount;
     }
 
     public void success() {

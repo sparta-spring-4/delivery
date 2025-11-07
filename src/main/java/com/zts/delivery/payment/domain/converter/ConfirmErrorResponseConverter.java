@@ -4,7 +4,7 @@ package com.zts.delivery.payment.domain.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zts.delivery.payment.domain.ConfirmErrorResponse;
+import com.zts.delivery.payment.domain.PaymentErrorResponse;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +17,13 @@ import java.util.List;
 @Converter
 @RequiredArgsConstructor
 @Component
-public class ConfirmErrorResponseConverter implements AttributeConverter<List<ConfirmErrorResponse>, String> {
+public class ConfirmErrorResponseConverter implements AttributeConverter<List<PaymentErrorResponse>, String> {
 
     private final ObjectMapper objectMapper;
 
 
     @Override
-    public String convertToDatabaseColumn(List<ConfirmErrorResponse> attribute) {
+    public String convertToDatabaseColumn(List<PaymentErrorResponse> attribute) {
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
@@ -33,7 +33,7 @@ public class ConfirmErrorResponseConverter implements AttributeConverter<List<Co
     }
 
     @Override
-    public List<ConfirmErrorResponse> convertToEntityAttribute(String dbData) {
+    public List<PaymentErrorResponse> convertToEntityAttribute(String dbData) {
         try {
             return objectMapper.readValue(dbData, new TypeReference<>() {
             });

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Builder
 @Embeddable
-public record ConfirmErrorResponse(
+public record PaymentErrorResponse(
         @Enumerated(EnumType.STRING)
         @Column(length = 45)
         HttpStatus httpStatus,
