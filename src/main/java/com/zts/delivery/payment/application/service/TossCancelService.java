@@ -47,6 +47,8 @@ public class TossCancelService {
         }
         payment.cancel(cancelClientResponse.cancels().getFirst().canceledAt().toLocalDateTime());
         paymentRepository.saveAndFlush(payment);
+
+        Events.trigger(new PaymentConfirmDoneEvent(payment.getOrderId()));
     }
 
     private PaymentFailLogEvent createCancelFailLogEvent(UserId userId, OrderId orderId,
