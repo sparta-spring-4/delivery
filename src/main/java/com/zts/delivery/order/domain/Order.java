@@ -58,20 +58,21 @@ public class Order extends BaseEntity {
     private OrderStatus status;
 
     @Builder
-    public Order(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo) {
+    public Order(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo, Price totalOrderPrice) {
         this.orderer = orderer;
         this.deliveryInfo = deliveryInfo;
-        this.status = OrderStatus.ORDER_ACCEPT;
-        setOrderItems(orderItems);
-        calculateTotalOrderPrice();
+        this.status = OrderStatus.ORDER_CREATED;
+        this.totalOrderPrice = totalOrderPrice;
+        this.orderItems = orderItems;
     }
 
-    public static Order create(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo) {
+    public static Order create(Orderer orderer, List<OrderItem> orderItems, DeliveryInfo deliveryInfo, Price cartTotalPrice) {
 
         Order order = Order.builder()
             .orderer(orderer)
-            .orderItems(orderItems)
             .deliveryInfo(deliveryInfo)
+            .orderItems(orderItems)
+            .totalOrderPrice(cartTotalPrice)
             .build();
 
         order.id = OrderId.of();
@@ -79,49 +80,44 @@ public class Order extends BaseEntity {
         return order;
     }
 
-    private void setOrderItems(List<OrderItem> orderItems) {
-        // if (orderItems == null || orderItems.isEmpty()) {
-        //     throw new Exception("Order must have at least one order item.");
-        // }
-
-        this.orderItems = orderItems;
-    }
-
-    private void calculateTotalOrderPrice() {
-        this.totalOrderPrice = new Price(orderItems.stream().mapToInt(x -> x.getPrice().getValue() * x.getQuantity()).sum());
-    }
-
-    // 주문 접수
-    public void  orderAccept() {
-        this.status = OrderStatus.ORDER_ACCEPT;
-
-        // 결제 요청 이벤트 발생 시키기
-        // Events.trigger(new OrderAcceptEvent(id));
-        return;
-    }
-
-    // 주문 취소
     public void cancel() {
-        // 입금 확인 전이면 주문 취소, 입금 후 주문 접수 후 5분 이내라면 상태라면 환불
-        if (this.status == OrderStatus.ORDER_ACCEPT) {
+        if (getCreatedAt() != null && LocalDateTime.now().isBefore(getCreatedAt().plusMinutes(5L))) {
             this.status = OrderStatus.ORDER_CANCEL;
-        } else if (getCreatedAt() != null && LocalDateTime.now().isBefore(getCreatedAt().plusMinutes(5L))) {
-            this.status = OrderStatus.ORDER_REFUND;
         }
     }
 
-    /**
-     * 배송 시작
-     * 배송 시작은 입금 확인 후 진행, 그러나 배송지가 매장에서 배송 가능한 지역이 아니라면 배송 불가 함
-     * 매장별 배송 불가 지역 체크 필요, 그러나 이 기능은 다른 도메인 기능이 필요하므로 도메인 서비스로 추가, 단순히 도메인 서비스에 주문 도메인의 delivery상태 변경 로직은 실행
-     */
-    public void delivery() {
+    public void paymentComplete() {
+        if (this.status != OrderStatus.ORDER_CREATED) {
+            return;
+        }
+        this.status = OrderStatus.PAYMENT_CONFIRM;
+    }
+
+    public void accept() {
         if (this.status != OrderStatus.PAYMENT_CONFIRM) {
             return;
         }
+        this.status = OrderStatus.PREPARING;
+    }
 
+    public void delivery() {
+        if (this.status != OrderStatus.PREPARING) {
+            return;
+        }
         this.status = OrderStatus.DELIVERING;
     }
 
+    public void delivered() {
+        if (this.status != OrderStatus.DELIVERING) {
+            return;
+        }
+        this.status = OrderStatus.DELIVERED;
+    }
 
+    public void refundComplete() {
+        if (this.status == OrderStatus.ORDER_CANCEL || this.status == OrderStatus.PAYMENT_CONFIRM) {
+            this.status = OrderStatus.ORDER_REFUND;
+        }
+        return;
+    }
 }
