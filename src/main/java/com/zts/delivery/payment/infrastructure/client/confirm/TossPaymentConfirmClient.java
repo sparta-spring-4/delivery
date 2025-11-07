@@ -6,6 +6,7 @@ import com.zts.delivery.payment.infrastructure.client.TossClientErrorResponse;
 import com.zts.delivery.payment.infrastructure.client.TossPaymentClientResponse;
 import com.zts.delivery.payment.infrastructure.config.TossPaymentKeyProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestClient;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @EnableConfigurationProperties(TossPaymentKeyProperties.class)
@@ -39,7 +41,7 @@ public class TossPaymentConfirmClient {
                     throw new TossClientErrorException(response.getStatusCode(), errorResponse.code(), errorResponse.message());
                 })
                 .toEntity(TossPaymentClientResponse.class);
-
+        log.debug("Toss payment confirm response={}", confirmResponse);
         return confirmResponse.getBody();
     }
 

@@ -7,6 +7,7 @@ import com.zts.delivery.payment.infrastructure.client.TossPaymentClientResponse;
 import com.zts.delivery.payment.infrastructure.config.TossPaymentKeyProperties;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestClient;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @EnableConfigurationProperties(TossPaymentKeyProperties.class)
@@ -31,9 +33,10 @@ public class TossPaymentCancelClient {
 
         String cancelUri = String.format(properties.cancel().uri(), cancelRequest.paymentKey());
 
-        TossPaymentCancelClientBody.TossPaymentCancelClientBodyBuilder body = TossPaymentCancelClientBody.builder()
+        TossPaymentCancelClientBody body = TossPaymentCancelClientBody.builder()
                 .cancelAmount(cancelRequest.cancelAmount())
-                .cancelReason(cancelRequest.cancelReason());
+                .cancelReason(cancelRequest.cancelReason())
+                .build();
 
         ResponseEntity<TossPaymentClientResponse> confirmResponse = RestClient.create().post()
                 .uri(cancelUri)
@@ -47,6 +50,7 @@ public class TossPaymentCancelClient {
                 })
                 .toEntity(TossPaymentClientResponse.class);
 
+        log.debug("Toss payment cancel response={}", confirmResponse);
         return confirmResponse.getBody();
     }
 
