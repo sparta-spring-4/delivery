@@ -1,6 +1,9 @@
 package com.zts.delivery.store.application.service;
 
-import com.zts.delivery.store.domain.*;
+import com.zts.delivery.store.domain.Store;
+import com.zts.delivery.store.domain.StoreCategory;
+import com.zts.delivery.store.domain.StoreId;
+import com.zts.delivery.store.domain.StoreRepository;
 import com.zts.delivery.store.domain.service.StoreAddressService;
 import com.zts.delivery.store.presentation.dto.StoreRequest;
 import com.zts.delivery.user.domain.UserId;
@@ -12,9 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -42,13 +45,16 @@ public class StoreCreateService {
             startHour = tmp;
         }
 
-        List<Double> coords = addressService.getCoordinate(req.storeAddress());
-        StoreAddress address = new StoreAddress(req.storeAddress(), coords.get(0), coords.get(1));
+        String tel = req.storeTel();
+        if (StringUtils.hasText(tel)) {
+            tel = tel.replaceAll("\\D", ""); // 전화번호에서 숫자만 남기기
+        }
 
         Store store = Store.builder()
                 .storeName(req.storeName())
-                .storeTel(req.storeTel())
-                .address(address)
+                .storeTel(tel)
+                .address(req.storeAddress())
+                .addressService(addressService)
                 .categories(req.category() == null ? null : req.category().stream()
                         .map(c -> new StoreCategory(c.category(), c.active())).toList())
                 .startHour(startHour)
@@ -57,7 +63,6 @@ public class StoreCreateService {
                 .userId(UserId.of(userId))
                 .userName(name)
                 .build();
-
 
         repository.save(store);
 
