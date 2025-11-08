@@ -94,7 +94,7 @@ public class TossConfirmService {
 
     private void priceOrderValidate(OrderId orderId, Price amount) {
         boolean validated = orderPriceValidator.validate(orderId, amount);
-        if (validated) {
+        if (!validated) {
             throw new PaymentPriceWrongException();
         }
     }
