@@ -1,7 +1,7 @@
 package com.zts.delivery.review.application.service;
 
 import com.zts.delivery.order.domain.OrderId;
-import com.zts.delivery.store.StoreId;
+import com.zts.delivery.store.domain.StoreId;
 import lombok.Builder;
 
 @Builder

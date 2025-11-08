@@ -1,7 +1,8 @@
 package com.zts.delivery.review.domain;
 
+import com.zts.delivery.global.persistence.common.DateAudit;
 import com.zts.delivery.order.domain.OrderId;
-import com.zts.delivery.store.StoreId;
+import com.zts.delivery.store.domain.StoreId;
 import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,7 @@ import lombok.*;
 @Access(AccessType.FIELD)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
-public class Review {
+public class Review extends DateAudit {
 
     @EmbeddedId
     private ReviewId id;
@@ -26,7 +27,6 @@ public class Review {
     @Embedded
     private UserId userId;
 
-    @Embedded
     private String comment;
 
     private int score;

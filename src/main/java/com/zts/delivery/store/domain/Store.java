@@ -46,4 +46,8 @@ public class Store extends BaseEntity {
         this.storeTel = storeTel;
         this.operatingInfo = new OperatingInfo(startHour, endHour, weekdays);
     }
+
+    public void addReviewScore() {
+
+    }
 }
