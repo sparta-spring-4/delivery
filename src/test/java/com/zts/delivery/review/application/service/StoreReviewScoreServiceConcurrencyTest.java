@@ -18,12 +18,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class StoreReviewScoreServiceTest {
+class StoreReviewScoreServiceConcurrencyTest {
 
     @Autowired
     private StoreReviewService scoreService;
@@ -80,7 +79,7 @@ class StoreReviewScoreServiceTest {
                 .orElseThrow(() -> new AssertionError("StoreReviewScore 엔티티를 찾을 수 없음"));
 
         // 1. 최종 리뷰 카운트 검증
-        long expectedReviewCount = THREAD_COUNT;
+        int expectedReviewCount = THREAD_COUNT;
         assertThat(finalScore.getReviewCount())
                 .as("최종 리뷰 카운트는 모든 스레드 수와 같아야 함")
                 .isEqualTo(expectedReviewCount);
