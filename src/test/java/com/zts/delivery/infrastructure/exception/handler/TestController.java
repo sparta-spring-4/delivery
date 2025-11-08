@@ -1,14 +1,12 @@
 package com.zts.delivery.infrastructure.exception.handler;
 
-import com.zts.delivery.infrastructure.execption.ApplicationException;
-import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.global.infrastructure.execption.ApplicationException;
+import com.zts.delivery.global.infrastructure.execption.ErrorCode;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 
 @RestController
 public class TestController {

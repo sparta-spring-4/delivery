@@ -1,4 +1,4 @@
-package com.zts.delivery.infrastructure.execption;
+package com.zts.delivery.global.infrastructure.execption;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

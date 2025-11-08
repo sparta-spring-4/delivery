@@ -1,7 +1,7 @@
 package com.zts.delivery.payment.domain.exception;
 
-import com.zts.delivery.infrastructure.execption.ApplicationException;
-import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.global.infrastructure.execption.ApplicationException;
+import com.zts.delivery.global.infrastructure.execption.ErrorCode;
 
 public class PaymentPriceWrongException extends ApplicationException {
 
