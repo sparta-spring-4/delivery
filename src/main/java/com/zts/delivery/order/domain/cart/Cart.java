@@ -1,5 +1,7 @@
 package com.zts.delivery.order.domain.cart;
 
+import com.zts.delivery.global.infrastructure.execption.ApplicationException;
+import com.zts.delivery.global.infrastructure.execption.ErrorCode;
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.common.DateAudit;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
@@ -46,18 +48,17 @@ public class Cart extends DateAudit {
     private List<CartItem> cartItems;
 
     @Convert(converter = PriceConverter.class)
-    private Price price;
+    private Price cartTotalPrice;
 
     @Builder
     public Cart(UserId userId) {
         this.id = CartId.of();
         this.userId = userId;
         this.cartItems = new ArrayList<>();
-        this.price = new Price(0);
+        this.cartTotalPrice = new Price(0);
     }
 
     public void addItem(Item item, List<Integer> optionList) {
-
         CartItem newItem = CartItem.builder()
             .id(item.getId())
             .quantity(1)
@@ -69,58 +70,52 @@ public class Cart extends DateAudit {
         calculateTotalPrice();
     }
 
-    // removeItem 메서드는 더 이상 항목을 제거하기 전에 itemIndex를 검증하지 않습니다. 제거된 검증 로직 'findCartItemByIndex(itemIndex)'는 유지하거나 범위를 확인하는 로직으로 대체하여 IndexOutOfBoundsException을 방지해야 합니다.
-    public void removeItem(Item item , int itemIndex) {
-        // isValidOptionIndices(item ,);
+    public void removeItem(int itemIndex) {
+        isValidItemIndex(itemIndex);
         this.cartItems.remove(itemIndex);
-        calculateTotalPrice(); // 총액 재계산
-    }
-
-    private void calculateTotalPrice() {
-        Price newTotal = new Price(0);
-        for (CartItem item : this.cartItems) {
-            newTotal = newTotal.add(item.calculateTotalPrice());
-        }
-        this.price = newTotal;
-    }
-
-
-    public void changeItemQuantity(int idx, boolean isAdding) {
-        CartItem item = this.cartItems.get(idx);
-        item.updateQuantity(isAdding);
-        this.cartItems.set(idx, item);
         calculateTotalPrice();
     }
 
+    public void calculateTotalPrice() {
+        this.cartTotalPrice = cartItems.stream().map(CartItem::getTotalPrice)
+            .reduce(new Price(0), Price::add);
+    }
+
+    public void changeItemQuantity(int idx, boolean isAdding) {
+        isValidItemIndex(idx);
+        CartItem item = this.cartItems.get(idx);
+        CartItem cartItem = item.updateQuantity(isAdding);
+        calculateTotalPrice();
+    }
 
     public void changeItemOptions(int idx, Item item, List<Integer> options) {
 
-        // 1. 해당 인덱스의 *기존* CartItem을 가져옵니다.
+        isValidOptionIndices(item, options);
         CartItem oldCartItem = this.cartItems.get(idx);
 
-        // 2. 검증 로직 (Item 객체가 필요합니다)
-        if(!isValidOptionIndices(item, options)) {
-            throw new IllegalArgumentException("Invalid option indices");
-        }
-
-        // 3. *새로운* 옵션으로 *새로운* CartItem 객체를 생성합니다.
-        CartItem newCartItem = oldCartItem.chooseOptions(item, options);
-
-        // 4. [핵심] 리스트에서 기존 객체를 새로운 객체로 교체합니다.
-        this.cartItems.set(idx, newCartItem);
-
-        // 5. [누락된 부분] 총액을 다시 계산합니다.
+        oldCartItem.updateOptions(item, options);
         calculateTotalPrice();
     }
 
-    private boolean isValidOptionIndices(Item item, List<Integer> optionIndices) {
+    public void deleteCartItem(int idx) {
+        isValidItemIndex(idx);
+        this.cartItems.remove(idx);
+        calculateTotalPrice();
+    }
+
+    private void isValidOptionIndices(Item item, List<Integer> optionIndices) {
         int optionsSize = item.getItemOptions() != null ? item.getItemOptions().size() : 0;
 
         for (Integer index : optionIndices) {
             if (index < 0 || index >= optionsSize) {
-                return false;
+                throw new ApplicationException(ErrorCode.REQUEST_VALIDATION_ERROR);
             }
         }
-        return true;
+    }
+
+    private void isValidItemIndex(int itemIndex) {
+        if(itemIndex < 0 || itemIndex >= this.cartItems.size()) {
+            throw new ApplicationException(ErrorCode.REQUEST_VALIDATION_ERROR);
+        }
     }
 }

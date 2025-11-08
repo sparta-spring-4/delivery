@@ -7,6 +7,7 @@ import com.zts.delivery.menu.domain.ItemOption;
 import com.zts.delivery.menu.domain.ItemRepository;
 import com.zts.delivery.order.domain.DeliveryInfo;
 import com.zts.delivery.order.domain.Order;
+import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.order.domain.OrderItem;
 import com.zts.delivery.order.domain.OrderItemOption;
 import com.zts.delivery.order.domain.OrderRepository;
@@ -17,12 +18,19 @@ import com.zts.delivery.order.domain.cart.CartItem;
 import com.zts.delivery.order.domain.cart.CartRepository;
 import com.zts.delivery.order.presentation.dto.OrderRequest;
 import com.zts.delivery.order.presentation.dto.OrderResponse;
+import com.zts.delivery.order.application.dto.OrderCancelEvent;
 import com.zts.delivery.user.domain.UserId;
+import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -30,6 +38,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final ItemRepository itemRepository;
+
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public OrderResponse create(OrderRequest req, UserId userId) {
@@ -52,6 +62,32 @@ public class OrderService {
 
     }
 
+    @Transactional
+    public void reject(OrderId orderId, UserId userId) {
+        Order t_order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+        t_order.cancel();
+        Order p_order = orderRepository.save(t_order);
+    }
+
+
+
+    @Transactional
+    public void cancel(OrderId orderId, UserId userId) {
+        Order t_order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+        t_order.cancel();
+        Order p_order = orderRepository.save(t_order);
+
+        OrderCancelEvent event = new OrderCancelEvent(
+            orderId,
+            p_order.getTotalOrderPrice(),
+            "고객 요청"
+        );
+
+        publisher.publishEvent(event);
+    }
+
     private List<OrderItem> convertCartItemsToOrderItems(Cart cart) {
         return cart.getCartItems().stream()
             .map(cartItem -> new OrderItem(
@@ -59,7 +95,7 @@ public class OrderService {
                 cartItem.getItemName(),
                 cartItem.getQuantity(),
                 convertCartItemsToOrderItemOptions(cartItem.getSelectedOptions(), cartItem.getId()),
-                cartItem.calculateTotalPrice()
+                cartItem.getTotalPrice()
             ))
             .toList();
     }
@@ -96,7 +132,56 @@ public class OrderService {
         return Order.create(
             orderer,
             orderItems,
-            deliveryInfo
+            deliveryInfo,
+            cart.getCartTotalPrice()
         );
+    }
+
+    @Transactional
+    public void acceptOrder(OrderId orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "주문을 찾을 수 없습니다."));
+
+        order.accept();
+    }
+
+    @Transactional
+    public void updateToDelivering(OrderId orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "주문을 찾을 수 없습니다."));
+        order.delivery();
+    }
+
+    @Transactional
+    public void updateToDelivered(OrderId orderId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "주문을 찾을 수 없습니다."));
+        order.delivered();
+    }
+
+    public void delete(OrderId id, UserPrincipal user) {
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+        if (!order.getOrderer().getId().equals(user.userId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN);
+        }
+        order.markAsDeleted(user.username());
+    }
+
+    public OrderResponse read(OrderId id, UserPrincipal user) {
+        Order order = orderRepository.findById(id)
+            .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
+        if (!order.getOrderer().getId().equals(user.userId())) {
+            throw new ApplicationException(ErrorCode.FORBIDDEN);
+        }
+        return OrderResponse.of(order);
+    }
+
+    public Page<OrderResponse> readAll(UserPrincipal user, Pageable pageable) {
+        Page<Order> orderPage = orderRepository.findAllByOrderer_Id_Id(
+            user.userId().getId(),
+            pageable
+        );
+        return orderPage.map(OrderResponse::of);
     }
 }

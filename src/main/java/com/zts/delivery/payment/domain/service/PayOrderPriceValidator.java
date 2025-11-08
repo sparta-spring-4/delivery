@@ -18,6 +18,6 @@ public class PayOrderPriceValidator {
     public boolean validate(OrderId orderId, Price price) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "Not found Order"));
-        return order.getTotalOrderPrice().equals(price);
+        return order.getTotalOrderPrice().getValue() == price.getValue();
     }
 }

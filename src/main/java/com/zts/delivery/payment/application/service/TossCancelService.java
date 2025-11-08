@@ -33,6 +33,8 @@ public class TossCancelService {
     private final PaymentRepository paymentRepository;
 
     public void cancel(CancelTossPayment cancelTossPayment) {
+        log.info("결제 취소 시작 (orderId: {})", cancelTossPayment.orderId().getId());
+
         Payment payment = paymentRepository.findByOrderId(cancelTossPayment.orderId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "Not Found Payment (OrderId=" + cancelTossPayment.orderId().getId() + ")"));
 
@@ -48,6 +50,8 @@ public class TossCancelService {
         }
         payment.cancel(cancelClientResponse.cancels().getFirst().canceledAt().toLocalDateTime());
         paymentRepository.saveAndFlush(payment);
+
+        log.info("결제 취소 완료 (orderId: {})", cancelTossPayment.orderId().getId());
 
         Events.trigger(new PaymentCancelDoneEvent(payment.getOrderId()));
     }

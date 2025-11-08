@@ -4,9 +4,8 @@ import com.zts.delivery.global.persistence.common.BaseEntity;
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
 import com.zts.delivery.menu.infrastructure.converter.StockConverter;
-import com.zts.delivery.store.StoreId;
+import com.zts.delivery.store.domain.StoreId;
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -108,17 +107,11 @@ public class Item extends BaseEntity {
         }
     }
 
-    public Price getOptionsPrice(List<Integer> optionIndices) {
-        if (optionIndices == null || optionIndices.isEmpty()) {
-            return new Price(0);
-        }
-
-        Price totalOptionsPrice = new Price(0);
-        for (Integer idx : optionIndices) {
-            ItemOption option = itemOptions.get(idx);
-            totalOptionsPrice = totalOptionsPrice.add(option.getPrice());
-        }
-
-        return totalOptionsPrice;
+    public Price getOptionsPrice(List<Integer> selectedOptions) {
+        return (selectedOptions == null || selectedOptions.isEmpty())
+            ? new Price(0)
+            : new Price(selectedOptions.stream()
+                .map(idx -> itemOptions.get(idx).getPrice().getValue())
+                .reduce(0, Integer::sum));
     }
 }
