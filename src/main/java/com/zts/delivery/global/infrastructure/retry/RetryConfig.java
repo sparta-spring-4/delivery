@@ -1,4 +1,4 @@
-package com.zts.delivery.infrastructure.retry;
+package com.zts.delivery.global.infrastructure.retry;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
