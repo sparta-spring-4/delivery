@@ -125,6 +125,8 @@ public class StoreDetailsDao implements StoreDetailsRepository {
                         .weekdays(item.getOperatingInfo().getWeekdays())
                         .category(item.getCategories().stream().map(StoreCategory::getCategory).toList())
                         .createdAt(item.getCreatedAt())
+                        .reviewCount(item.getReviewCount())
+                        .averageReviewScore(item.getAverageReviewScore())
                         .build())
                 .toList();
 

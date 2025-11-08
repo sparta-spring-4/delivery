@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -47,6 +49,10 @@ public class Store extends BaseEntity {
     @OrderColumn(name = "category_idx")
     private List<StoreCategory> categories;
 
+    private int reviewCount;
+
+    private BigDecimal averageReviewScore;
+
     @Builder
     public Store(StoreId id, String storeName, String storeTel, LocalTime startHour, LocalTime endHour, List<DayOfWeek> weekdays,
                  UserId userId, String userName, String address, List<StoreCategory> categories, StoreAddressService addressService) {
@@ -60,6 +66,8 @@ public class Store extends BaseEntity {
 
         // 주소 -> 좌표 변환
         changeAddress(address, addressService);
+
+        averageReviewScore = new BigDecimal(0).setScale(2, RoundingMode.HALF_UP);
     }
 
     private void setCategories(List<StoreCategory> categories) {
@@ -137,4 +145,9 @@ public class Store extends BaseEntity {
         return items == null ? new ArrayList<>() : new ArrayList<>(items);
     }
 
+    // 리뷰 갯수, 리뷰 평점 수정
+    public void changeReview(int reviewCount, BigDecimal averageReviewScore) {
+        this.reviewCount = reviewCount;
+        this.averageReviewScore = averageReviewScore;
+    }
 }

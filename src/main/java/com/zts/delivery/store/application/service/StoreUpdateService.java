@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
@@ -44,6 +45,12 @@ public class StoreUpdateService {
     public void updateAddress(UUID storeId, String address) {
         Store store = validateAndGet(storeId);
         store.changeAddress(address, addressService);
+    }
+
+    // 매장 리뷰 수정
+    public void updateReview(UUID storeId, int reviewCount, BigDecimal averageReviewScore) {
+        Store store = validateAndGet(storeId);
+        store.changeReview(reviewCount, averageReviewScore);
     }
 
     // 매장 존재 여부 및 수정 권한 검증 후 엔티티 반환
