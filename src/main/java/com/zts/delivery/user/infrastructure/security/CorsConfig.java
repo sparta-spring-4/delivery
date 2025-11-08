@@ -12,7 +12,7 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    private static final String ALLOWED_ORIGIN = "http://localhost:4242";
+    private static final String ALLOWED_ORIGIN = "*"; // 프론트 테스트를 위해 임시로 설정
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

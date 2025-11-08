@@ -101,7 +101,6 @@ jobs:
             
             # 6. 임시 .env 파일 즉시 삭제 (⭐️필수 권장 단계)
             echo "Removing temporary .env file..."
-            sudo rm .env.temp
             
             # 7. (선택적) 컨테이너 상태 확인
             docker compose ps
