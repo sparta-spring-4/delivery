@@ -17,7 +17,7 @@ public class StoreAddress {
     private double longitude;
 
     @Builder
-    protected StoreAddress(String address, double latitude, double longitude) {
+    public StoreAddress(String address, double latitude, double longitude) {
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;

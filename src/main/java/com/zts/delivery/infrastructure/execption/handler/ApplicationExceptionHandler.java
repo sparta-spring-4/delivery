@@ -6,6 +6,7 @@ import com.zts.delivery.infrastructure.execption.ErrorResponse;
 import com.zts.delivery.infrastructure.execption.FieldError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -54,10 +55,11 @@ public class ApplicationExceptionHandler {
     public ResponseEntity<ErrorResponse<Void>> handleAllUncaughtException(Exception e) {
         log.error("Exception", e);
 
-        ErrorCode internalServerError = ErrorCode.INTERNAL_SERVER_ERROR;
+        ErrorCode errorCode = e instanceof AuthorizationDeniedException ? ErrorCode.UNAUTHORIZED : ErrorCode.INTERNAL_SERVER_ERROR;
+
         return ResponseEntity
-                .status(internalServerError.getHttpStatus())
+                .status(errorCode.getHttpStatus())
                 .body(
-                        new ErrorResponse<>(internalServerError.getCode(), internalServerError.getDefaultMessage(), null));
+                        new ErrorResponse<>(errorCode.getCode(), errorCode.getDefaultMessage(), null));
     }
 }
