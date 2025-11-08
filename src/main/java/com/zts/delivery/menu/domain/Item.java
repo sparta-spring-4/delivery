@@ -4,7 +4,7 @@ import com.zts.delivery.global.persistence.common.BaseEntity;
 import com.zts.delivery.global.persistence.Price;
 import com.zts.delivery.global.persistence.converter.PriceConverter;
 import com.zts.delivery.menu.infrastructure.converter.StockConverter;
-import com.zts.delivery.store.StoreId;
+import com.zts.delivery.store.domain.StoreId;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
