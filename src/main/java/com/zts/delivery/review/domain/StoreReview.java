@@ -22,7 +22,7 @@ public class StoreReview extends DateAudit {
     @EmbeddedId
     private StoreId storeId;
 
-    private long reviewCount;
+    private int reviewCount;
 
     private long totalReviewScore;
 
@@ -40,7 +40,7 @@ public class StoreReview extends DateAudit {
 
     public void updateScore(int newReviewScore) {
         long currentTotal = this.totalReviewScore + newReviewScore;
-        long currentCount = this.reviewCount + 1;
+        int currentCount = this.reviewCount + 1;
 
         BigDecimal newTotal = new BigDecimal(currentTotal);
         BigDecimal newCount = new BigDecimal(currentCount);

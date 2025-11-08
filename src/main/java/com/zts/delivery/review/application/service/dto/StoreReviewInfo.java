@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Builder
 public record StoreReviewInfo(
         StoreId storeId,
-        long reviewCount,
+        int reviewCount,
         BigDecimal averageScore
 ) {
     public static StoreReviewInfo of(StoreReview storeReview) {

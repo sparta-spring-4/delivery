@@ -1,8 +1,10 @@
 package com.zts.delivery.review.application.service;
 
+import com.zts.delivery.infrastructure.event.Events;
 import com.zts.delivery.infrastructure.execption.ApplicationException;
 import com.zts.delivery.infrastructure.execption.ErrorCode;
 import com.zts.delivery.review.application.service.dto.StoreReviewInfo;
+import com.zts.delivery.review.application.service.dto.StoreReviewUpdateEvent;
 import com.zts.delivery.review.domain.StoreReview;
 import com.zts.delivery.review.domain.repository.StoreReviewRepository;
 import com.zts.delivery.store.domain.StoreId;
@@ -34,7 +36,10 @@ public class StoreReviewService {
 
         scoreEntity.updateScore(newReviewScore);
 
-        storeReviewRepository.save(scoreEntity);
+        StoreReview savedStoreReview = storeReviewRepository.save(scoreEntity);
+
+        Events.trigger(new StoreReviewUpdateEvent(savedStoreReview.getStoreId(), savedStoreReview.getReviewCount(),
+                savedStoreReview.getAverageScore()));
     }
 
     public StoreReviewInfo findBy(StoreId storeId) {

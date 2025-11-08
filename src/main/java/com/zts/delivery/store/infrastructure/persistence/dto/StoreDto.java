@@ -3,6 +3,7 @@ package com.zts.delivery.store.infrastructure.persistence.dto;
 import com.zts.delivery.store.domain.Category;
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -23,5 +24,7 @@ public record StoreDto(
     LocalTime endHour,
     List<DayOfWeek> weekdays,
     List<Category> category,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    int reviewCount,
+    BigDecimal averageReviewScore
 ) {}
