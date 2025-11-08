@@ -1,26 +1,29 @@
 package com.zts.delivery.review.application.service;
 
+import com.zts.delivery.review.application.service.dto.RegisterReview;
+import com.zts.delivery.review.application.service.dto.ReviewInfo;
 import com.zts.delivery.review.domain.Review;
 import com.zts.delivery.review.domain.repository.ReviewRepository;
 import com.zts.delivery.store.domain.StoreId;
-import com.zts.delivery.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final StoreReviewScoreService storeReviewScoreService;
-
+    private final StoreReviewService storeReviewScoreService;
 
     @Transactional
-    public void register(UserId userId, RegisterReview registerReview) {
+    public void register(RegisterReview registerReview) {
         Review review = Review.builder()
-                .userId(userId)
+                .userId(registerReview.userId())
+                .username(registerReview.username())
                 .storeId(registerReview.storeId())
                 .orderId(registerReview.orderId())
                 .comment(registerReview.comment())
@@ -30,7 +33,10 @@ public class ReviewService {
         storeReviewScoreService.updateScoreWhenReviewSaved(review.getStoreId(), review.getScore());
     }
 
-    public void findAllBy(StoreId storeId, Pageable pageable) {
-        reviewRepository.findAllByStoreId(storeId, pageable);
+    public List<ReviewInfo> findAllBy(StoreId storeId, Pageable pageable) {
+        List<Review> reviews = reviewRepository.findAllByStoreId(storeId, pageable);
+        return reviews.stream()
+                .map(ReviewInfo::of)
+                .toList();
     }
 }

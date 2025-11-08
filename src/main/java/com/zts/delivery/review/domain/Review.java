@@ -27,16 +27,19 @@ public class Review extends DateAudit {
     @Embedded
     private UserId userId;
 
+    private String username;
+
     private String comment;
 
     private int score;
 
     @Builder
-    public Review(StoreId storeId, OrderId orderId, UserId userId, String comment, int score) {
+    public Review(StoreId storeId, OrderId orderId, UserId userId, String username, String comment, int score) {
         this.id = ReviewId.of();
         this.storeId = storeId;
         this.orderId = orderId;
         this.userId = userId;
+        this.username = username;
         this.comment = comment;
         this.score = score;
     }

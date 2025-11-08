@@ -1,7 +1,7 @@
 package com.zts.delivery.review.application.service;
 
-import com.zts.delivery.review.domain.StoreReviewScore;
-import com.zts.delivery.review.domain.repository.StoreReviewScoreRepository;
+import com.zts.delivery.review.domain.StoreReview;
+import com.zts.delivery.review.domain.repository.StoreReviewRepository;
 import com.zts.delivery.store.domain.StoreId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,10 +26,10 @@ import static org.assertj.core.api.Assertions.fail;
 class StoreReviewScoreServiceTest {
 
     @Autowired
-    private StoreReviewScoreService scoreService;
+    private StoreReviewService scoreService;
 
     @Autowired
-    private StoreReviewScoreRepository scoreRepository;
+    private StoreReviewRepository scoreRepository;
 
     private static final StoreId TEST_STORE_ID = new StoreId(UUID.randomUUID());
     private static final int THREAD_COUNT = 5;
@@ -42,7 +42,7 @@ class StoreReviewScoreServiceTest {
         scoreRepository.flush();
 
         // 초기 엔티티 생성 및 저장 (version = 0)
-        StoreReviewScore initialScore = new StoreReviewScore(TEST_STORE_ID);
+        StoreReview initialScore = new StoreReview(TEST_STORE_ID);
         scoreRepository.saveAndFlush(initialScore);
     }
 
@@ -76,7 +76,7 @@ class StoreReviewScoreServiceTest {
         executorService.shutdown();
 
         // Then
-        StoreReviewScore finalScore = scoreRepository.findById(TEST_STORE_ID)
+        StoreReview finalScore = scoreRepository.findById(TEST_STORE_ID)
                 .orElseThrow(() -> new AssertionError("StoreReviewScore 엔티티를 찾을 수 없음"));
 
         // 1. 최종 리뷰 카운트 검증

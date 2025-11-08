@@ -13,11 +13,11 @@ import java.math.RoundingMode;
 
 @Entity
 @Getter
-@Table(name = "P_STORE_REVIEW_SCORE")
+@Table(name = "P_STORE_REVIEW")
 @Access(AccessType.FIELD)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
-public class StoreReviewScore extends DateAudit {
+public class StoreReview extends DateAudit {
 
     @EmbeddedId
     private StoreId storeId;
@@ -31,7 +31,7 @@ public class StoreReviewScore extends DateAudit {
     @Version
     private Long version;
 
-    public StoreReviewScore(StoreId storeId) {
+    public StoreReview(StoreId storeId) {
         this.storeId = storeId;
         this.reviewCount = 0;
         this.totalReviewScore = 0;

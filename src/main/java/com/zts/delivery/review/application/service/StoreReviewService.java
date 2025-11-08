@@ -1,7 +1,10 @@
 package com.zts.delivery.review.application.service;
 
-import com.zts.delivery.review.domain.StoreReviewScore;
-import com.zts.delivery.review.domain.repository.StoreReviewScoreRepository;
+import com.zts.delivery.infrastructure.execption.ApplicationException;
+import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.review.application.service.dto.StoreReviewInfo;
+import com.zts.delivery.review.domain.StoreReview;
+import com.zts.delivery.review.domain.repository.StoreReviewRepository;
 import com.zts.delivery.store.domain.StoreId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StoreReviewScoreService {
-    private final StoreReviewScoreRepository scoreRepository;
+public class StoreReviewService {
+    private final StoreReviewRepository storeReviewRepository;
 
     @Retryable(
             retryFor = {ObjectOptimisticLockingFailureException.class},
@@ -26,16 +29,23 @@ public class StoreReviewScoreService {
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateScoreWhenReviewSaved(StoreId storeId, int newReviewScore) {
-        StoreReviewScore scoreEntity = scoreRepository.findById(storeId)
-                .orElseGet(() -> new StoreReviewScore(storeId));
+        StoreReview scoreEntity = storeReviewRepository.findById(storeId)
+                .orElseGet(() -> new StoreReview(storeId));
 
         scoreEntity.updateScore(newReviewScore);
 
-        scoreRepository.save(scoreEntity);
+        storeReviewRepository.save(scoreEntity);
+    }
+
+    public StoreReviewInfo findBy(StoreId storeId) {
+        StoreReview storeReview = storeReviewRepository.findById(storeId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND, "Not found storeReview"));
+        return StoreReviewInfo.of(storeReview);
     }
 
     @Recover
     public void recoverUpdateScore(ObjectOptimisticLockingFailureException e, StoreId storeId, int newReviewScore) {
-        throw new RuntimeException("리뷰 점수 집계 업데이트 실패: 낙관적 잠금 충돌 지속", e);
+        throw new RuntimeException("리뷰 점수 집계 업데이트 실패: 낙관적 잠금 충돌 지속 (storeId=%s, newReviewScore=%d)"
+                .formatted(storeId.getId(), newReviewScore), e);
     }
 }
