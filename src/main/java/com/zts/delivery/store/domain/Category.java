@@ -5,5 +5,6 @@ public enum Category {
     CHINESE,
     SNACK,
     CHICKEN,
-    PIZZA
+    PIZZA,
+    JAPANESES
 }
