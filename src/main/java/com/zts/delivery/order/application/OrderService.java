@@ -5,30 +5,25 @@ import com.zts.delivery.global.infrastructure.execption.ErrorCode;
 import com.zts.delivery.menu.domain.ItemId;
 import com.zts.delivery.menu.domain.ItemOption;
 import com.zts.delivery.menu.domain.ItemRepository;
-import com.zts.delivery.order.domain.DeliveryInfo;
-import com.zts.delivery.order.domain.Order;
-import com.zts.delivery.order.domain.OrderId;
-import com.zts.delivery.order.domain.OrderItem;
-import com.zts.delivery.order.domain.OrderItemOption;
-import com.zts.delivery.order.domain.OrderRepository;
-import com.zts.delivery.order.domain.Orderer;
+import com.zts.delivery.order.application.dto.OrderCancelEvent;
+import com.zts.delivery.order.domain.*;
 import com.zts.delivery.order.domain.cart.Cart;
 import com.zts.delivery.order.domain.cart.CartId;
 import com.zts.delivery.order.domain.cart.CartItem;
 import com.zts.delivery.order.domain.cart.CartRepository;
 import com.zts.delivery.order.presentation.dto.OrderRequest;
 import com.zts.delivery.order.presentation.dto.OrderResponse;
-import com.zts.delivery.order.application.dto.OrderCancelEvent;
 import com.zts.delivery.user.domain.UserId;
 import com.zts.delivery.user.infrastructure.security.UserPrincipal;
-import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -168,8 +163,9 @@ public class OrderService {
         order.markAsDeleted(user.username());
     }
 
+    @Transactional(readOnly = true)
     public OrderResponse read(OrderId id, UserPrincipal user) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findByIdWithOrderItems(id)
             .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND));
         if (!order.getOrderer().getId().equals(user.userId())) {
             throw new ApplicationException(ErrorCode.FORBIDDEN);
