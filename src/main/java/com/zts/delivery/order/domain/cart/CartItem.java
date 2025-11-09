@@ -59,6 +59,7 @@ public class CartItem {
     public static CartItem create(Item item, List<Integer> selectedOptions) {
         Price price = item.getPrice();
         Price optionsPrice = item.getOptionsPrice(selectedOptions);
+        Price totalPrice = price.add(optionsPrice).multiply(1);
 
         return CartItem.builder()
             .id(item.getId())
@@ -66,7 +67,7 @@ public class CartItem {
             .quantity(1)
             .selectedOptions(selectedOptions)
             .price(price)
-            .totalPrice(price.add(optionsPrice))
+            .totalPrice(totalPrice)
             .build();
     }
 
@@ -94,5 +95,10 @@ public class CartItem {
             .price(this.price)
             .totalPrice(this.price.add(newOptionsPrice).multiply(this.quantity))
             .build();
+    }
+
+    public void calculateTotalPrice(Item item, List<Integer> selectedOptions) {
+        Price optionsPrice = item.getOptionsPrice(selectedOptions);
+        this.totalPrice = this.totalPrice.add(optionsPrice).multiply(this.quantity);
     }
 }
