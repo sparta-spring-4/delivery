@@ -93,7 +93,7 @@ public class StoreController {
 
     @Operation(summary = "매장 검색", description = "매장을 검색합니다.")
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('USER', 'OWNER', 'MANAGER', 'MASTER')")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER', 'MANAGER', 'MASTER')")
     public ListData<StoreDto> searchStore(SearchRequest request) { // page, size
         SearchDto search = SearchDto.builder()
                 .storeName(request.storeName())
