@@ -13,6 +13,8 @@ import com.zts.delivery.store.presentation.dto.CategoryDto;
 import com.zts.delivery.store.presentation.dto.SearchRequest;
 import com.zts.delivery.store.presentation.dto.StoreRequest;
 import com.zts.delivery.store.presentation.dto.StoreResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Tag(name = "매장 API", description = "매장 추가 / 정보 수정 / 삭제 / 카테고리 관리 / 검색 기능을 제공합니다.")
 @RestController
 @RequestMapping("v1/stores")
 @RequiredArgsConstructor
@@ -33,11 +36,7 @@ public class StoreController {
     private final StoreDeleteService deleteService;
     private final StoreDetailsRepository detailsRepository;
 
-    /**
-     * 매장 추가
-     * @param request
-     * @return
-     */
+    @Operation(summary = "매장 추가", description = "매장을 추가합니다.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('OWNER', 'MANAGER', 'MASTER')")
@@ -47,11 +46,7 @@ public class StoreController {
         return new StoreResponse(storeId);
     }
 
-    /**
-     * 매장 정보 수정
-     * @param storeId
-     * @param request
-     */
+    @Operation(summary = "매장 정보 수정", description = "매장 정보를 수정합니다.")
     @PatchMapping("/{storeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyRole('OWNER', 'MANAGER', 'MASTER')")
@@ -66,10 +61,7 @@ public class StoreController {
         updateService.updateAddress(storeId, request.storeAddress());
     }
 
-    /**
-     * 매장 삭제
-     * @param storeId
-     */
+    @Operation(summary = "매장 삭제", description = "매장을 삭제합니다.")
     @DeleteMapping("/{storeId}")
     @PreAuthorize("hasAnyRole('OWNER', 'MANAGER', 'MASTER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -77,33 +69,21 @@ public class StoreController {
         deleteService.delete(storeId);
     }
 
-    /**
-     * 매장 분류 추가
-     * @param storeId
-     * @param categoryDto
-     */
+    @Operation(summary = "매장 분류 추가", description = "매장 분류를 추가합니다.")
     @PostMapping("/{storeId}/category")
     @ResponseStatus(HttpStatus.CREATED)
     public void addCategory(@PathVariable("storeId") UUID storeId, @RequestBody CategoryDto categoryDto) {
         updateService.addCategory(storeId, categoryDto.category(), categoryDto.active());
     }
 
-    /**
-     * 매장 분류 치환(수정)
-     * @param storeId
-     * @param categories
-     */
+    @Operation(summary = "매장 분류 수정", description = "매장 분류를 수정(치환)합니다.")
     @PutMapping("/{storeId}/categories")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeCategories(@PathVariable("storeId") UUID storeId, @RequestBody List<CategoryDto> categories) {
         updateService.changeCategories(storeId, categories);
     }
 
-    /**
-     * 매장 분류 삭제
-     * @param storeId
-     * @param categories
-     */
+    @Operation(summary = "매장 분류 삭제", description = "매장 분류를 삭제합니다.")
     @PatchMapping("/{storeId}/category")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeCategory(@PathVariable UUID storeId, @RequestBody List<Category> categories) {
@@ -111,11 +91,7 @@ public class StoreController {
         categories.forEach(c -> updateService.removeCategory(storeId, c));
     }
 
-    /**
-     * 매장 검색
-     * @param request
-     * @return
-     */
+    @Operation(summary = "매장 검색", description = "매장을 검색합니다.")
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('USER', 'OWNER', 'MANAGER', 'MASTER')")
     public ListData<StoreDto> searchStore(SearchRequest request) { // page, size
