@@ -8,6 +8,7 @@ import com.zts.delivery.global.persistence.converter.PriceConverter;
 import com.zts.delivery.menu.domain.Item;
 import com.zts.delivery.user.domain.UserId;
 import jakarta.persistence.*;
+import java.util.Objects;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -45,12 +46,7 @@ public class Cart extends DateAudit {
     }
 
     public void addItem(Item item, List<Integer> optionList) {
-        CartItem newItem = CartItem.builder()
-            .id(item.getId())
-            .quantity(1)
-            .selectedOptions(optionList)
-            .price(item.getPrice())
-            .build();
+        CartItem newItem = CartItem.create(item, optionList);
 
         this.cartItems.add(newItem);
         calculateTotalPrice();
@@ -63,8 +59,14 @@ public class Cart extends DateAudit {
     }
 
     public void calculateTotalPrice() {
-        this.cartTotalPrice = cartItems.stream().map(CartItem::getTotalPrice)
+        Price total = (cartItems == null ? java.util.Collections.<CartItem>emptyList() : cartItems)
+            .stream()
+            .filter(Objects::nonNull)
+            .map(CartItem::getTotalPrice)
+            .filter(Objects::nonNull)
             .reduce(new Price(0), Price::add);
+
+        this.cartTotalPrice = total;
     }
 
     public void changeItemQuantity(int idx, boolean isAdding) {
