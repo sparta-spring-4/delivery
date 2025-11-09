@@ -1,6 +1,6 @@
 package com.zts.delivery.order.application;
 
-import com.zts.delivery.infrastructure.execption.ApplicationException;
+import com.zts.delivery.global.infrastructure.execption.ApplicationException;
 import com.zts.delivery.order.domain.OrderId;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

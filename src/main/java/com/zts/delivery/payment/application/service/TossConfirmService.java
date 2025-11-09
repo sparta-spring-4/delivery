@@ -1,7 +1,7 @@
 package com.zts.delivery.payment.application.service;
 
 import com.zts.delivery.global.persistence.Price;
-import com.zts.delivery.infrastructure.event.Events;
+import com.zts.delivery.global.infrastructure.event.Events;
 import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.payment.application.dto.ConfirmTossPayment;
 import com.zts.delivery.payment.application.dto.PaymentConfirmDoneEvent;

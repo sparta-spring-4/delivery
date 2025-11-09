@@ -2,8 +2,8 @@ package com.zts.delivery.user.application.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zts.delivery.infrastructure.execption.ApplicationException;
-import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.global.infrastructure.execption.ApplicationException;
+import com.zts.delivery.global.infrastructure.execption.ErrorCode;
 import com.zts.delivery.user.application.dto.KeycloakErrorResponse;
 import com.zts.delivery.user.infrastructure.keycloak.KeycloakProperties;
 import com.zts.delivery.user.application.dto.TokenInfo;

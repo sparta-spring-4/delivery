@@ -1,8 +1,8 @@
 package com.zts.delivery.payment.domain.service;
 
 import com.zts.delivery.global.persistence.Price;
-import com.zts.delivery.infrastructure.execption.ApplicationException;
-import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.global.infrastructure.execption.ApplicationException;
+import com.zts.delivery.global.infrastructure.execption.ErrorCode;
 import com.zts.delivery.order.domain.Order;
 import com.zts.delivery.order.domain.OrderId;
 import com.zts.delivery.order.domain.OrderRepository;

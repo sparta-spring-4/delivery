@@ -1,6 +1,6 @@
 package com.zts.delivery.payment.infrastructure.client;
 
-import com.zts.delivery.infrastructure.execption.ApplicationException;
+import com.zts.delivery.global.infrastructure.execption.ApplicationException;
 import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
 

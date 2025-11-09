@@ -1,7 +1,7 @@
 package com.zts.delivery.user.application.service;
 
-import com.zts.delivery.infrastructure.execption.ApplicationException;
-import com.zts.delivery.infrastructure.execption.ErrorCode;
+import com.zts.delivery.global.infrastructure.execption.ApplicationException;
+import com.zts.delivery.global.infrastructure.execption.ErrorCode;
 import com.zts.delivery.user.application.dto.*;
 import com.zts.delivery.user.domain.User;
 import com.zts.delivery.user.domain.UserAddress;

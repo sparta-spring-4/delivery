@@ -1,4 +1,4 @@
-package com.zts.delivery.global.web.config;
+package com.zts.delivery.global.infrastructure.web.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
