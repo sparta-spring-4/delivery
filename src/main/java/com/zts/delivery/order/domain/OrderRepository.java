@@ -18,4 +18,9 @@ public interface OrderRepository extends JpaRepository<Order, OrderId> {
      List<Order> findAllByOrderer_Id(UserId ordererId);
 
     Page<Order> findAllByOrderer_Id_Id(UUID userUuid, Pageable pageable);
+
+    @Query("SELECT DISTINCT o FROM Order o " +
+            "JOIN FETCH o.orderItems oi " + // orderItems 필드를 페치 조인
+            "WHERE o.id = :orderId")
+    Optional<Order> findByIdWithOrderItems(@Param("orderId") OrderId orderId);
 }
