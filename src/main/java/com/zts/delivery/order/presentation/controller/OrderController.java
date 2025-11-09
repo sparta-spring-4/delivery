@@ -11,6 +11,8 @@ import com.zts.delivery.user.infrastructure.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -77,8 +79,8 @@ public class OrderController {
 
     @Operation(summary = "주문 조회", description = "주문 조회")
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable OrderId orderId, @AuthenticationPrincipal UserPrincipal user) {
-        OrderResponse response = orderService.read(orderId, user);
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable UUID orderId, @AuthenticationPrincipal UserPrincipal user) {
+        OrderResponse response = orderService.read(OrderId.of(orderId), user);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
