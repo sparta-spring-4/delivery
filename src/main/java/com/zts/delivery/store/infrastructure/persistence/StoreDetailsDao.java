@@ -113,6 +113,7 @@ public class StoreDetailsDao implements StoreDetailsRepository {
                 .fetch()
                 .stream()
                 .map(item -> StoreDto.builder()
+                        .storeId(item.getId().getId())
                         .ownerId(item.getOwner().getId().getId())
                         .ownerName(item.getOwner().getName())
                         .storeName(item.getStoreName())
